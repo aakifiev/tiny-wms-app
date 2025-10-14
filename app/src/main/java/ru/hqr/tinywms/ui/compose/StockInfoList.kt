@@ -27,15 +27,14 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import ru.hqr.tinywms.conf.TinyWmsRest
-import ru.hqr.tinywms.dto.client.StockInfo
+import ru.hqr.tinywms.dto.client.StockListInfo
 import ru.hqr.tinywms.service.getClientId
-import ru.hqr.tinywms.ui.component.createCustomModalNavigationDrawer
 
 @Composable
 fun StockInfoList(barcode: String, drawerState: DrawerState, scope: CoroutineScope) {
 
     val response = remember {
-        mutableStateOf(emptyList<StockInfo>())
+        mutableStateOf(emptyList<StockListInfo>())
     }
     val clientId = remember {
         mutableIntStateOf(0)
@@ -47,7 +46,7 @@ fun StockInfoList(barcode: String, drawerState: DrawerState, scope: CoroutineSco
                 .background(color = Color.Green)
                 .fillMaxWidth()) {
                 Text(modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center,
-                    text = "clientId: ${clientId.value}", color = Color.Black)
+                    text = "clientId: ${clientId.intValue}", color = Color.Black)
                 Text(modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center,
                     text = barcode, color = Color.Black)
             }
@@ -57,13 +56,14 @@ fun StockInfoList(barcode: String, drawerState: DrawerState, scope: CoroutineSco
         val sharedPreferences =
             context.getSharedPreferences("TinyPrefs", Context.MODE_PRIVATE)
         val result = TinyWmsRest.retrofitService.findStockInfo(1, barcode)
-        result!!.enqueue(object : Callback<List<StockInfo>?> {
-            override fun onResponse(p0: Call<List<StockInfo>?>, p1: Response<List<StockInfo>?>) {
-                clientId.value = getClientId(sharedPreferences)
+        result!!.enqueue(object : Callback<List<StockListInfo>?> {
+            override fun onResponse(p0: Call<List<StockListInfo>?>, p1: Response<List<StockListInfo>?>) {
+                Log.i("onResponse", p1.toString())
+                clientId.intValue = getClientId(sharedPreferences)
                 response.value = p1.body()!!
             }
 
-            override fun onFailure(p0: Call<List<StockInfo>?>, p1: Throwable) {
+            override fun onFailure(p0: Call<List<StockListInfo>?>, p1: Throwable) {
                 Log.i("onFailure", "onFailure")
 //                response.value = "Error found is : " + p1.message
             }
@@ -77,19 +77,19 @@ fun StockInfoList(barcode: String, drawerState: DrawerState, scope: CoroutineSco
                     stockInfo -> MessageRow(stockInfo)
             }
         }
-        createCustomModalNavigationDrawer(drawerState, scope)
     }
 }
 
 @Composable
 fun MessageRow(
-    message: StockInfo
+    message: StockListInfo
 ) {
     Card (modifier = Modifier.padding(8.dp)) {
         Column(
             modifier = Modifier.padding(8.dp).fillMaxWidth(),
             verticalArrangement = Arrangement.Center
         ) {
+            Text(message.addressId)
             Text(message.barcode)
             Text(message.quantity.toString())
             Text(message.measureUnit)

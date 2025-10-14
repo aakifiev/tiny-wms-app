@@ -16,6 +16,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import ru.hqr.tinywms.ui.component.СreateCustomModalNavigationDrawer
 import ru.hqr.tinywms.ui.compose.CameraScreen
 import ru.hqr.tinywms.ui.compose.HomeScreen
 import ru.hqr.tinywms.ui.compose.LoginPage
@@ -58,7 +59,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
             val scope = rememberCoroutineScope()
-//            createCustomModalNavigationDrawer(drawerState, scope)
+            СreateCustomModalNavigationDrawer(drawerState, scope)
             TinyWmsTheme {
                 val navController = rememberNavController()
                 NavHost(navController, startDestination = "stockList") {
@@ -68,8 +69,8 @@ class MainActivity : ComponentActivity() {
                             popBackStack = {
                                 navController.popBackStack()
                             },
-                            toProductInfo = {
-                                barcode -> navController.navigate("productInfo/barcode=$barcode")
+                            toProductInfo = { barcode ->
+                                navController.navigate("productInfo/barcode=$barcode")
                             }
                         )
                     }
@@ -79,8 +80,8 @@ class MainActivity : ComponentActivity() {
                             popBackStack = {
                                 navController.popBackStack()
                             },
-                            toProductInfo = {
-                                    barcode -> navController.navigate("productInfo/barcode=$barcode")
+                            toProductInfo = { barcode ->
+                                navController.navigate("productInfo/barcode=$barcode")
                             }
                         )
                     }
@@ -90,13 +91,15 @@ class MainActivity : ComponentActivity() {
                         ProductInfo(barcode as String)
                     }
                     composable("stockList") {
-                        StockList(onStockInfoClick = {
-                                barcode -> navController.navigate("stockInfoList/barcode=$barcode")
-                        },
+                        StockList(
+                            onStockInfoClick = { barcode ->
+                                navController.navigate("stockInfoList/barcode=$barcode")
+                            },
                             navigateBack = {
                                 navController.popBackStack()
                             },
-                            drawerState, scope)
+                            drawerState, scope, navController
+                        )
                     }
                     composable("stockInfoList/barcode={barcode}") { backStackEntry ->
                         val arguments = requireNotNull(backStackEntry.arguments)
@@ -104,7 +107,8 @@ class MainActivity : ComponentActivity() {
                         StockInfoList(barcode as String, drawerState, scope)
                     }
                     composable("loginPage") {
-                        LoginPage(navController,
+                        LoginPage(
+                            navController,
                             navigateBack = {
                                 navController.popBackStack()
                             })

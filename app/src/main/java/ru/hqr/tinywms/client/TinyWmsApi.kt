@@ -6,6 +6,7 @@ import retrofit2.Call
 import ru.hqr.tinywms.dto.client.Barcode
 import ru.hqr.tinywms.dto.client.Stock
 import ru.hqr.tinywms.dto.client.StockInfo
+import ru.hqr.tinywms.dto.client.StockListInfo
 
 interface TinyWmsApi {
 
@@ -19,5 +20,5 @@ interface TinyWmsApi {
     fun findStockInfo(
         @Path("client") client: Int,
         @Path("barcode") barcode: String
-    ): Call<List<StockInfo>>
+    ): Call<List<StockListInfo>>
 }

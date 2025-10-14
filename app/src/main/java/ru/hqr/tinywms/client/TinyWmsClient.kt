@@ -3,7 +3,7 @@ package ru.hqr.tinywms.client
 import retrofit2.Call
 import ru.hqr.tinywms.dto.client.Barcode
 import ru.hqr.tinywms.dto.client.Stock
-import ru.hqr.tinywms.dto.client.StockInfo
+import ru.hqr.tinywms.dto.client.StockListInfo
 
 class TinyWmsClient : TinyWmsApi {
 
@@ -15,7 +15,10 @@ class TinyWmsClient : TinyWmsApi {
         TODO("Not yet implemented")
     }
 
-    override fun findStockInfo(client: Int, barcode: String): Call<List<StockInfo>> {
+    override fun findStockInfo(
+        client: Int,
+        barcode: String
+    ): Call<List<StockListInfo>> {
         TODO("Not yet implemented")
     }
 }

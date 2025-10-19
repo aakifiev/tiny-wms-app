@@ -3,6 +3,8 @@ package ru.hqr.tinywms.client
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.Call
+import retrofit2.http.Body
+import retrofit2.http.POST
 import ru.hqr.tinywms.dto.client.Barcode
 import ru.hqr.tinywms.dto.client.Stock
 import ru.hqr.tinywms.dto.client.StockInfo
@@ -21,4 +23,11 @@ interface TinyWmsApi {
         @Path("client") client: Int,
         @Path("barcode") barcode: String
     ): Call<List<StockListInfo>>
+
+    @POST("/stocks/clients/{client}/addresses/{addressId}/actualize")
+    fun actualizeStockInfo(
+        @Path("client") client: Int,
+        @Path("addressId") addressId: String,
+        @Body stocks: List<StockInfo>
+    ): Call<Void>
 }

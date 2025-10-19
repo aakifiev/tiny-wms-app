@@ -49,7 +49,7 @@ fun FilterableList(
 fun MessageRow(
     message: Stock, onClick: () -> Unit
 ) {
-    Card (modifier = Modifier.padding(8.dp),
+    Card (modifier = Modifier.padding().fillMaxWidth(),
         onClick = onClick) {
         Column(
             modifier = Modifier.padding(8.dp),

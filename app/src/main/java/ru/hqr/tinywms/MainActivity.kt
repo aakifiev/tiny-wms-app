@@ -16,7 +16,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import ru.hqr.tinywms.ui.component.СreateCustomModalNavigationDrawer
 import ru.hqr.tinywms.ui.compose.CameraScreen
 import ru.hqr.tinywms.ui.compose.HomeScreen
 import ru.hqr.tinywms.ui.compose.LoginPage
@@ -59,7 +58,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
             val scope = rememberCoroutineScope()
-            СreateCustomModalNavigationDrawer(drawerState, scope)
             TinyWmsTheme {
                 val navController = rememberNavController()
                 NavHost(navController, startDestination = "stockList") {
@@ -104,7 +102,7 @@ class MainActivity : ComponentActivity() {
                     composable("stockInfoList/barcode={barcode}") { backStackEntry ->
                         val arguments = requireNotNull(backStackEntry.arguments)
                         val barcode = arguments.getString("barcode")
-                        StockInfoList(barcode as String, drawerState, scope)
+                        StockInfoList(barcode as String, drawerState, scope, navController)
                     }
                     composable("loginPage") {
                         LoginPage(

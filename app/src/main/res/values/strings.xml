@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">TinyWms</string>
+    <string name="camera_view_identifier">[CameraView]</string>
 </resources>

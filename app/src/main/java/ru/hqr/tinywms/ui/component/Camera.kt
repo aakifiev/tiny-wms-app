@@ -1,13 +1,10 @@
 package ru.hqr.tinywms.ui.component
 
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
-import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -17,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import ru.hqr.tinywms.R
 import ru.hqr.tinywms.util.mainactivity.getCameraProvider
 import java.util.concurrent.Executor
 
@@ -28,7 +26,7 @@ fun Camera(
 ) {
 // MARK: VARIABLES
     val context = LocalContext.current
-    val identifier = "[CameraView]"
+    val identifier = context.getString(R.string.camera_view_identifier)
 
     // MARK: CAMERA SETUP AND RENDER
     // 1

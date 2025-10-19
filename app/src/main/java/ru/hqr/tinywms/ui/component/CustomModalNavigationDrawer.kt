@@ -1,54 +1,69 @@
 package ru.hqr.tinywms.ui.component
 
-import android.util.Log
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.DrawerState
-import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
-fun СreateCustomModalNavigationDrawer(drawerState: DrawerState, scope: CoroutineScope) {
+fun CustomModalNavigationDrawer(
+    drawerState: DrawerState, scope: CoroutineScope,
+    navController: NavHostController,
+    content: @Composable () -> Unit
+) {
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            ModalDrawerSheet (
+            ModalDrawerSheet(
                 drawerContainerColor = Color.DarkGray,
-                drawerContentColor =  Color.LightGray
+                drawerContentColor = Color.LightGray
             ) {
                 Text("Drawer title", modifier = Modifier.padding(16.dp))
                 HorizontalDivider()
                 NavigationDrawerItem(
-                    label = { Text(text = "Drawer Item") },
+                    label = { Text(text = "home") },
                     selected = false,
                     onClick = {
+                        navController.navigate("home")
                         scope.launch { drawerState.close() }
                     }
                 )
-                // ...other drawer items
+                NavigationDrawerItem(
+                    label = { Text(text = "stock info") },
+                    selected = false,
+                    onClick = {
+                        navController.navigate("stockList")
+                        scope.launch { drawerState.close() }
+                    }
+                )
+                NavigationDrawerItem(
+                    label = { Text(text = "stock info") },
+                    selected = false,
+                    onClick = {
+                        navController.navigate("stockList")
+                        scope.launch { drawerState.close() }
+                    }
+                )
+                NavigationDrawerItem(
+                    label = { Text(text = "camera") },
+                    selected = false,
+                    onClick = {
+                        navController.navigate("camera")
+                        scope.launch { drawerState.close() }
+                    }
+                )
             }
         },
-        content = {
-            IconButton (onClick = {
-                scope.launch { drawerState.open() }
-            }) {
-                Icon(Icons.Filled.Menu, "Меню")
-            }
-        }
+        content = content
     )
 }

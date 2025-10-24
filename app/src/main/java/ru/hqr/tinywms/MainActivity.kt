@@ -16,6 +16,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import ru.hqr.tinywms.ui.compose.AddressList
 import ru.hqr.tinywms.ui.compose.CameraScreen
 import ru.hqr.tinywms.ui.compose.HomeScreen
 import ru.hqr.tinywms.ui.compose.LoginPage
@@ -26,6 +27,9 @@ import ru.hqr.tinywms.ui.theme.TinyWmsTheme
 import ru.hqr.tinywms.util.mainactivity.startCamera
 import ru.hqr.tinywms.util.mainactivity.stopCamera
 import ru.hqr.tinywms.util.requestCameraPermission
+import ru.hqr.tinywms.view.AddressListViewModel
+import ru.hqr.tinywms.view.StockInfoListViewModel
+import ru.hqr.tinywms.view.StockListViewModel
 import java.util.concurrent.ExecutorService
 
 class MainActivity : ComponentActivity() {
@@ -52,6 +56,9 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalGetImage::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val vm = StockListViewModel()
+        val stockInfoListVM = StockInfoListViewModel()
+        val addressListVM = AddressListViewModel()
         requestCameraPermission()
         startCamera()
         enableEdgeToEdge()
@@ -60,7 +67,7 @@ class MainActivity : ComponentActivity() {
             val scope = rememberCoroutineScope()
             TinyWmsTheme {
                 val navController = rememberNavController()
-                NavHost(navController, startDestination = "stockList") {
+                NavHost(navController, startDestination = "addressList") {
                     composable("home") {
                         HomeScreen(
                             executorHs = cameraExecutor,
@@ -88,21 +95,36 @@ class MainActivity : ComponentActivity() {
                         val barcode = arguments.getString("barcode")
                         ProductInfo(barcode as String)
                     }
-                    composable("stockList") {
-                        StockList(
+                    composable("addressList") {
+                        AddressList(
                             onStockInfoClick = { barcode ->
-                                navController.navigate("stockInfoList/barcode=$barcode")
+                                navController.navigate("stockInfoList/barcode=$barcode/byBarcode=false")
                             },
                             navigateBack = {
                                 navController.popBackStack()
                             },
-                            drawerState, scope, navController
+                            drawerState, scope, addressListVM, navController
                         )
                     }
-                    composable("stockInfoList/barcode={barcode}") { backStackEntry ->
+                    composable("stockList") {
+                        StockList(
+                            onStockInfoClick = { barcode ->
+//                                navController.navigate("stockInfoList/barcode=$barcode")
+                                navController.navigate("stockInfoList/barcode=$barcode/byBarcode=true")
+                            },
+                            navigateBack = {
+                                navController.popBackStack()
+                            },
+                            drawerState, scope, vm, navController
+                        )
+                    }
+                    composable("stockInfoList/barcode={barcode}/byBarcode={byBarcode}") { backStackEntry ->
                         val arguments = requireNotNull(backStackEntry.arguments)
                         val barcode = arguments.getString("barcode")
-                        StockInfoList(barcode as String, drawerState, scope, navController)
+                        val byBarcode = arguments.getString("byBarcode").toBoolean()
+                        StockInfoList(
+                            barcode as String, byBarcode,
+                            drawerState, scope, stockInfoListVM, navController)
                     }
                     composable("loginPage") {
                         LoginPage(

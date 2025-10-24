@@ -79,7 +79,8 @@ dependencies {
     implementation("com.google.mlkit:text-recognition:16.0.1")
 
 //    implementation("androidx.compose.material:material:1.7.5")
-//    implementation("androidx.compose.material3:material3:1.3.1")
+    implementation("androidx.compose.material3:material3:1.3.1")
+    implementation(libs.material)
 
 //    runtimeOnly("com.google.mlkit:barcode-scanning:17.3.0")
 

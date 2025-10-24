@@ -32,7 +32,7 @@ import ru.hqr.tinywms.dto.client.StockInfo
 fun ActualizeDialog(
     showDialog: MutableState<Boolean>,
     addressId: MutableState<String> = mutableStateOf(""),
-    barcode: String = ""
+    barcode: MutableState<String> = mutableStateOf("")
 ) {
     val rememberCoroutineScope = rememberCoroutineScope()
     if (!showDialog.value) return
@@ -57,7 +57,7 @@ fun ActualizeDialog(
 //                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
-                    text = "Update stock for $barcode at ${addressId.value}",
+                    text = "Update stock for ${barcode.value} at ${addressId.value}",
                     modifier = Modifier.padding(16.dp),
                 )
                 TextField(
@@ -81,24 +81,24 @@ fun ActualizeDialog(
                     TextButton(
                         onClick = {
                             val stockInfo = StockInfo(
-                                barcode,
+                                barcode.value,
                                 quantity.value.toBigDecimal(),
                                 "UNIT")
                             rememberCoroutineScope.launch {
                                 TinyWmsRest.retrofitService.actualizeStockInfo(
                                     1,
                                     addressId.value,
-                                    listOf(stockInfo)).enqueue(object : Callback<Void> {
+                                    listOf(stockInfo)).enqueue(object : Callback<Unit> {
                                     override fun onResponse(
-                                        p0: Call<Void>,
-                                        p1: Response<Void>
+                                        p0: Call<Unit>,
+                                        p1: Response<Unit>
                                     ) {
                                         Log.i("onResponse", p1.toString())
 //                                        clientId.intValue = getClientId(sharedPreferences)
 //                                        response.value = p1.body()!!
                                     }
 
-                                    override fun onFailure(p0: Call<Void>, p1: Throwable) {
+                                    override fun onFailure(p0: Call<Unit>, p1: Throwable) {
                                         Log.i("onFailure", "onFailure")
 //                response.value = "Error found is : " + p1.message
                                     }

@@ -25,13 +25,13 @@ fun CustomModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet(
-                drawerContainerColor = Color.DarkGray,
-                drawerContentColor = Color.LightGray
+                drawerContainerColor = Color.Green,
+                drawerContentColor = Color.Red
             ) {
                 Text("Drawer title", modifier = Modifier.padding(16.dp))
                 HorizontalDivider()
                 NavigationDrawerItem(
-                    label = { Text(text = "home") },
+                    label = { Text(text = "home", color = Color.Black) },
                     selected = false,
                     onClick = {
                         navController.navigate("home")
@@ -39,7 +39,7 @@ fun CustomModalNavigationDrawer(
                     }
                 )
                 NavigationDrawerItem(
-                    label = { Text(text = "stock info") },
+                    label = { Text(text = "stock list") },
                     selected = false,
                     onClick = {
                         navController.navigate("stockList")
@@ -47,10 +47,10 @@ fun CustomModalNavigationDrawer(
                     }
                 )
                 NavigationDrawerItem(
-                    label = { Text(text = "stock info") },
+                    label = { Text(text = "Address list") },
                     selected = false,
                     onClick = {
-                        navController.navigate("stockList")
+                        navController.navigate("addressList")
                         scope.launch { drawerState.close() }
                     }
                 )

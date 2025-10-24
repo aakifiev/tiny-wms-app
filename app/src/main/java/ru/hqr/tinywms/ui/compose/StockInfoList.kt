@@ -25,11 +25,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -40,24 +45,31 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import ru.hqr.tinywms.conf.TinyWmsRest
 import ru.hqr.tinywms.dto.client.StockListInfo
-import ru.hqr.tinywms.service.getClientId
 import ru.hqr.tinywms.ui.component.ActualizeDialog
 import ru.hqr.tinywms.ui.component.CustomModalNavigationDrawer
+import ru.hqr.tinywms.view.StockInfoListViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StockInfoList(barcode: String,
+                  byBarcode: Boolean,
                   drawerState: DrawerState,
                   scope: CoroutineScope,
+                  vm: StockInfoListViewModel,
                   navController: NavHostController) {
 
-    val response = remember {
-        mutableStateOf(emptyList<StockListInfo>())
+    var isRefreshing by remember { mutableStateOf(false) }
+    val onRefresh: () -> Unit = {
+        isRefreshing = true
+        scope.launch {
+            if (byBarcode) {
+                vm.getStockInfoList(1, barcode)
+            } else {
+                vm.getStockInfoListByAddressId(1, barcode)
+            }
+            isRefreshing = false
+        }
     }
     val clientId = remember {
         mutableIntStateOf(0)
@@ -70,12 +82,21 @@ fun StockInfoList(barcode: String,
     val addressId = remember {
         mutableStateOf("")
     }
-//    val barcode = remember {
-//        mutableStateOf("")
-//    }
+
+    val barcodeForActualize = remember {
+        mutableStateOf("")
+    }
+
+    LaunchedEffect(Unit, block = {
+        if (byBarcode) {
+            vm.getStockInfoList(1, barcode)
+        } else {
+            vm.getStockInfoListByAddressId(1, barcode)
+        }
+    })
 
 
-    ActualizeDialog(showDialog = showDialog, addressId = addressId, barcode = barcode)
+    ActualizeDialog(showDialog = showDialog, addressId = addressId, barcode = barcodeForActualize)
 
     CustomModalNavigationDrawer(
         drawerState = drawerState,
@@ -125,33 +146,24 @@ fun StockInfoList(barcode: String,
                 }
             }
         ) { padding ->
+            val state = rememberPullToRefreshState()
             val context = LocalContext.current
             val sharedPreferences =
                 context.getSharedPreferences("TinyPrefs", Context.MODE_PRIVATE)
-            val result = TinyWmsRest.retrofitService.findStockInfo(1, barcode)
-            result.enqueue(object : Callback<List<StockListInfo>?> {
-                override fun onResponse(
-                    p0: Call<List<StockListInfo>?>,
-                    p1: Response<List<StockListInfo>?>
-                ) {
-                    Log.i("onResponse", p1.toString())
-                    clientId.intValue = getClientId(sharedPreferences)
-                    response.value = p1.body()!!
-                }
 
-                override fun onFailure(p0: Call<List<StockListInfo>?>, p1: Throwable) {
-                    Log.i("onFailure", "onFailure")
-//                response.value = "Error found is : " + p1.message
-                }
-
-            })
-            Column(
-                Modifier
-                    .padding(padding)
-                    .verticalScroll(rememberScrollState())
+            PullToRefreshBox(
+                state = state,
+                onRefresh = onRefresh,
+                isRefreshing = isRefreshing,
             ) {
-                response.value.forEach { stockInfo ->
-                    MessageRow(stockInfo, showDialog, addressId)
+                Column(
+                    Modifier
+                        .padding(padding)
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    vm.stockInfoList.forEach { stockInfo ->
+                        MessageRow(stockInfo, showDialog, addressId, barcodeForActualize)
+                    }
                 }
             }
         }
@@ -164,6 +176,7 @@ fun MessageRow(
     message: StockListInfo,
     showDialog: MutableState<Boolean>,
     addressId: MutableState<String>,
+    barcodeForActualize: MutableState<String>,
 ) {
     val current = LocalHapticFeedback.current
     val expanded = remember {
@@ -191,6 +204,7 @@ fun MessageRow(
                     Log.i("DropdownMenuItem", "DropdownMenuItemEdit")
                     expanded.value = false
                     addressId.value = message.addressId
+                    barcodeForActualize.value = message.barcode
                     showDialog.value = true
                 }
             )

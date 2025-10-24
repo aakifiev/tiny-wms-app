@@ -35,23 +35,22 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import ru.hqr.tinywms.dto.client.Stock
 import ru.hqr.tinywms.ui.component.CustomModalNavigationDrawer
-import ru.hqr.tinywms.ui.component.FilterableList
-import ru.hqr.tinywms.view.StockListViewModel
+import ru.hqr.tinywms.ui.component.FilterableAddressList
+import ru.hqr.tinywms.view.AddressListViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StockList(
+fun AddressList(
     onStockInfoClick: (barcode: String) -> Unit,
     navigateBack: () -> Unit,
     drawerState: DrawerState,
     scope: CoroutineScope,
-    vm: StockListViewModel,
+    vm: AddressListViewModel,
     navController: NavHostController
 ) {
 
     LaunchedEffect(Unit, block = {
-        vm.getStockList(1)
-//        vm.getStockList(getClientId())
+        vm.getAddressList(1)
     })
 
     var isRefreshing by remember { mutableStateOf(false) }
@@ -61,7 +60,7 @@ fun StockList(
     val onRefresh: () -> Unit = {
         isRefreshing = true
         scope.launch {
-            vm.getStockList(1)
+            vm.getAddressList(1)
             isRefreshing = false
         }
     }
@@ -77,7 +76,7 @@ fun StockList(
                 CenterAlignedTopAppBar(
                     title = {
                         Text(
-                            "Stock list",
+                            "Address list",
                         )
                     },
                     navigationIcon = {
@@ -175,8 +174,8 @@ fun StockList(
 //                        )
 //                    },
                 ) {
-                    FilterableList(
-                        items = vm.stocks,
+                    FilterableAddressList(
+                        items = vm.addresses,
                         query = searchQuery,
                         onStockInfoClick = onStockInfoClick
                     )

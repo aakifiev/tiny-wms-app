@@ -1,6 +1,7 @@
 package ru.hqr.tinywms.client
 
 import retrofit2.Call
+import ru.hqr.tinywms.dto.client.AddressInfo
 import ru.hqr.tinywms.dto.client.Barcode
 import ru.hqr.tinywms.dto.client.Stock
 import ru.hqr.tinywms.dto.client.StockInfo
@@ -23,11 +24,22 @@ class TinyWmsClient : TinyWmsApi {
         TODO("Not yet implemented")
     }
 
+    override fun findAddressList(client: Int): Call<List<AddressInfo>> {
+        TODO("Not yet implemented")
+    }
+
+    override fun findStockInfoListByAddress(
+        client: Int,
+        addressId: String
+    ): Call<List<StockInfo>> {
+        TODO("Not yet implemented")
+    }
+
     override fun actualizeStockInfo(
         client: Int,
         addressId: String,
         stocks: List<StockInfo>
-    ): Call<Void> {
+    ): Call<Unit> {
         TODO("Not yet implemented")
     }
 }

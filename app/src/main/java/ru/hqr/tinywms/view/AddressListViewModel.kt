@@ -29,18 +29,15 @@ class AddressListViewModel: ViewModel() {
                 result.enqueue(object : Callback<List<AddressInfo>?> {
                     override fun onResponse(p0: Call<List<AddressInfo>?>, p1: Response<List<AddressInfo>?>) {
                         Log.i("onResponse", p1.toString())
-//                response.value = (p1.body()?.barcode ?: "") + ":" + (p1.body()?.title ?: "")
                         p1.body()!!.map { it.addressId }.forEach { _addresses.add(it) }
-//                        response.value = p1.body()!!
                     }
 
                     override fun onFailure(p0: Call<List<AddressInfo>?>, p1: Throwable) {
                         Log.i("onFailure", "onFailure")
-//                response.value = "Error found is : " + p1.message
                     }
 
                 })
-//                _stocks.addAll(TinyWmsRest.retrofitService.findStocks(getClientId()))
+                _addresses.toSet().toList()
             } catch (e: Exception) {
                 errorMessage = e.message.toString()
             }

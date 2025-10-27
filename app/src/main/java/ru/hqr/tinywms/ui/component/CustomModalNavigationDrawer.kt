@@ -25,21 +25,15 @@ fun CustomModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet(
-                drawerContainerColor = Color.Green,
-                drawerContentColor = Color.Red
+                drawerContainerColor = Color.LightGray,
+                drawerContentColor = Color.Black,
             ) {
-                Text("Drawer title", modifier = Modifier.padding(16.dp))
-                HorizontalDivider()
-                NavigationDrawerItem(
-                    label = { Text(text = "home", color = Color.Black) },
-                    selected = false,
-                    onClick = {
-                        navController.navigate("home")
-                        scope.launch { drawerState.close() }
-                    }
+                Text("Menu", modifier = Modifier.padding(16.dp))
+                HorizontalDivider(
+                    color = Color.Black
                 )
                 NavigationDrawerItem(
-                    label = { Text(text = "stock list") },
+                    label = { Text(text = "stock list", color = Color.Black) },
                     selected = false,
                     onClick = {
                         navController.navigate("stockList")
@@ -47,7 +41,7 @@ fun CustomModalNavigationDrawer(
                     }
                 )
                 NavigationDrawerItem(
-                    label = { Text(text = "Address list") },
+                    label = { Text(text = "Address list", color = Color.Black) },
                     selected = false,
                     onClick = {
                         navController.navigate("addressList")
@@ -55,10 +49,10 @@ fun CustomModalNavigationDrawer(
                     }
                 )
                 NavigationDrawerItem(
-                    label = { Text(text = "camera") },
+                    label = { Text(text = "Add stock", color = Color.Black) },
                     selected = false,
                     onClick = {
-                        navController.navigate("camera")
+                        navController.navigate("addStock")
                         scope.launch { drawerState.close() }
                     }
                 )

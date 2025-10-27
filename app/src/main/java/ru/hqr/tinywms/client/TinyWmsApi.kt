@@ -42,4 +42,11 @@ interface TinyWmsApi {
         @Path("addressId") addressId: String,
         @Body stocks: List<StockInfo>
     ): Call<Unit>
+
+    @POST("/stocks/clients/{client}/addresses/{addressId}/add")
+    fun addStockInfo(
+        @Path("client") client: Int,
+        @Path("addressId") addressId: String,
+        @Body stocks: List<StockInfo>
+    ): Call<Unit>
 }

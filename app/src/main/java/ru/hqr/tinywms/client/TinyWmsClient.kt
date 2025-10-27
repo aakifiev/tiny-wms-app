@@ -42,4 +42,12 @@ class TinyWmsClient : TinyWmsApi {
     ): Call<Unit> {
         TODO("Not yet implemented")
     }
+
+    override fun addStockInfo(
+        client: Int,
+        addressId: String,
+        stocks: List<StockInfo>
+    ): Call<Unit> {
+        TODO("Not yet implemented")
+    }
 }

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Menu
@@ -14,6 +15,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -33,7 +35,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import ru.hqr.tinywms.dto.client.Stock
 import ru.hqr.tinywms.ui.component.CustomModalNavigationDrawer
 import ru.hqr.tinywms.ui.component.FilterableAddressList
 import ru.hqr.tinywms.view.AddressListViewModel
@@ -96,6 +97,15 @@ fun AddressList(
                         }
                     }
                 )
+            },
+            floatingActionButton = {
+                FloatingActionButton(
+                    onClick = {
+
+                    }
+                ) {
+                    Icon(Icons.Filled.Add, "Add address")
+                }
             }
         ) { padding ->
             Column(
@@ -175,7 +185,7 @@ fun AddressList(
 //                    },
                 ) {
                     FilterableAddressList(
-                        items = vm.addresses,
+                        items = vm.addresses.toList(),
                         query = searchQuery,
                         onStockInfoClick = onStockInfoClick
                     )

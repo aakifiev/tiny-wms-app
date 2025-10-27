@@ -16,6 +16,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import ru.hqr.tinywms.ui.compose.AddStock
 import ru.hqr.tinywms.ui.compose.AddressList
 import ru.hqr.tinywms.ui.compose.CameraScreen
 import ru.hqr.tinywms.ui.compose.HomeScreen
@@ -38,8 +39,6 @@ class MainActivity : ComponentActivity() {
     val identifier = "[MainActivity]"
     var shouldShowCamera: MutableState<Boolean> = mutableStateOf(false)
 
-//    var shouldShowCamera by remember { mutableStateOf(true) }
-
     // MARK: Camera Permissions
     val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -56,7 +55,7 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalGetImage::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val vm = StockListViewModel()
+        val productListVM = StockListViewModel()
         val stockInfoListVM = StockInfoListViewModel()
         val addressListVM = AddressListViewModel()
         requestCameraPermission()
@@ -109,13 +108,22 @@ class MainActivity : ComponentActivity() {
                     composable("stockList") {
                         StockList(
                             onStockInfoClick = { barcode ->
-//                                navController.navigate("stockInfoList/barcode=$barcode")
                                 navController.navigate("stockInfoList/barcode=$barcode/byBarcode=true")
                             },
                             navigateBack = {
                                 navController.popBackStack()
                             },
-                            drawerState, scope, vm, navController
+                            drawerState, scope, productListVM, navController
+                        )
+                    }
+                    composable("addStock") {
+                        AddStock(
+                            navigateBack = {
+                                navController.popBackStack()
+                            },
+                            drawerState, scope,
+                            addressListVM, productListVM,
+                            navController
                         )
                     }
                     composable("stockInfoList/barcode={barcode}/byBarcode={byBarcode}") { backStackEntry ->
@@ -134,49 +142,6 @@ class MainActivity : ComponentActivity() {
                             })
                     }
                 }
-//                Column (modifier = Modifier.fillMaxSize()) {
-//                    val navController = rememberNavController()
-//                    NavHost(navController, startDestination = "home") {
-//
-//                    }
-//                    Spacer(modifier = Modifier.height(40.dp))
-//                    Box(modifier = Modifier
-//                        .fillMaxWidth(fraction = 0.9f)
-//                        .height(36.dp)
-//                        .clip(shape = RoundedCornerShape(6.dp))) {
-//                        Button(enabled = true, modifier = Modifier
-//                            .fillMaxWidth()
-//                            .fillMaxHeight(), onClick = {
-//                                navController.popBackStack()
-//                        }) {
-//                            Text("Like")
-//                        }
-//                    }
-//                    Spacer(modifier = Modifier.height(4.dp))
-//                    Box(modifier = Modifier
-//                        .fillMaxWidth(fraction = 0.9f)
-//                        .height(36.dp)
-//                        .clip(shape = RoundedCornerShape(6.dp))) {
-//                        Button(enabled = true, modifier = Modifier
-//                            .fillMaxWidth()
-//                            .fillMaxHeight(), onClick = { }) {
-//                            Text("Like 2")
-//                        }
-//                    }
-//                    Spacer(modifier = Modifier.height(4.dp))
-//                    Box(modifier = Modifier
-//                        .fillMaxWidth(fraction = 0.9f)
-//                        .height(360.dp)
-//                        .clip(shape = RoundedCornerShape(6.dp))) {
-//                        Camera(
-//                            executor = cameraExecutor,
-//                            onError = {
-//                            Log.i(identifier, "There was as error with the camera: $it")
-//                        },
-//                                    onCatchBarcode = { navController.navigate("") })
-//                    }
-//
-//                }
             }
         }
     }

@@ -33,7 +33,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import ru.hqr.tinywms.dto.client.Stock
 import ru.hqr.tinywms.ui.component.CustomModalNavigationDrawer
 import ru.hqr.tinywms.ui.component.FilterableList
 import ru.hqr.tinywms.view.StockListViewModel
@@ -51,7 +50,6 @@ fun StockList(
 
     LaunchedEffect(Unit, block = {
         vm.getStockList(1)
-//        vm.getStockList(getClientId())
     })
 
     var isRefreshing by remember { mutableStateOf(false) }

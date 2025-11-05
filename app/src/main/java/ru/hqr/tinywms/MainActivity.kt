@@ -66,7 +66,7 @@ class MainActivity : ComponentActivity() {
             val scope = rememberCoroutineScope()
             TinyWmsTheme {
                 val navController = rememberNavController()
-                NavHost(navController, startDestination = "addressList") {
+                NavHost(navController, startDestination = "addStock") {
                     composable("home") {
                         HomeScreen(
                             executorHs = cameraExecutor,
@@ -123,6 +123,7 @@ class MainActivity : ComponentActivity() {
                             },
                             drawerState, scope,
                             addressListVM, productListVM,
+                            cameraExecutor,
                             navController
                         )
                     }

@@ -38,6 +38,7 @@ class StockInfoListViewModel : ViewModel() {
                             .map {
                                 StockListInfo(
                                     it.barcode,
+                                    it.title,
                                     addressId,
                                     it.quantity,
                                     it.measureUnit
@@ -82,7 +83,6 @@ class StockInfoListViewModel : ViewModel() {
                     }
 
                 })
-//                _stocks.addAll(TinyWmsRest.retrofitService.findStocks(getClientId()))
             } catch (e: Exception) {
                 errorMessage = e.message.toString()
             }

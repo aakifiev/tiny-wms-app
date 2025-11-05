@@ -2,9 +2,7 @@ package ru.hqr.tinywms.dto.client
 
 import java.math.BigDecimal
 
-data class StockListInfo(
+data class StockInfoRequest(
     val barcode: String,
-    val title: String,
-    val addressId: String,
     val quantity: BigDecimal,
     val measureUnit: String)

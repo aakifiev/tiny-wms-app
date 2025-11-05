@@ -33,6 +33,14 @@ fun CustomModalNavigationDrawer(
                     color = Color.Black
                 )
                 NavigationDrawerItem(
+                    label = { Text(text = "Сканировать товар", color = Color.Black) },
+                    selected = false,
+                    onClick = {
+                        navController.navigate("home")
+                        scope.launch { drawerState.close() }
+                    }
+                )
+                NavigationDrawerItem(
                     label = { Text(text = "stock list", color = Color.Black) },
                     selected = false,
                     onClick = {

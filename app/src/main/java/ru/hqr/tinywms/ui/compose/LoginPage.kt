@@ -38,12 +38,12 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.edit
 import androidx.navigation.NavHostController
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import ru.hqr.tinywms.conf.EmployeeWmsRest
-import ru.hqr.tinywms.dto.client.EmployeeClientId
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,7 +55,7 @@ fun LoginPage(navController: NavHostController,
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        "Navigation example",
+                        "Login Page",
                     )
                 },
                 navigationIcon = {
@@ -161,19 +161,19 @@ fun LoginPage(navController: NavHostController,
                                 context.getSharedPreferences("TinyPrefs", Context.MODE_PRIVATE)
                             EmployeeWmsRest.retrofitService
                                 .findEmployee(email.value.text, password.value.text)
-                                .enqueue(object : Callback<EmployeeClientId?> {
-                                    override fun onResponse(p0: Call<EmployeeClientId?>, p1: Response<EmployeeClientId?>) {
-                                        p1.body()?.clientId.let {
+                                .enqueue(object : Callback<Int?> {
+                                    override fun onResponse(p0: Call<Int?>, p1: Response<Int?>) {
+                                        p1.body()?.let {
                                             if (it != null) {
-                                                val editor = sharedPreferences.edit()
-                                                editor.putInt("clientId", it)
-                                                editor.apply()
+                                                sharedPreferences.edit {
+                                                    putInt("clientId", it)
+                                                }
                                                 navController.navigate("stockList")
                                             }
                                         }
                                     }
 
-                                    override fun onFailure(p0: Call<EmployeeClientId?>, p1: Throwable) {
+                                    override fun onFailure(p0: Call<Int?>, p1: Throwable) {
                                         Log.i("", "login failure")
                                     }
                                 })

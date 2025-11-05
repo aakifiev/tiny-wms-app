@@ -1,5 +1,6 @@
 package ru.hqr.tinywms.ui.compose
 
+import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,6 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
@@ -50,8 +52,13 @@ fun AddressList(
     navController: NavHostController
 ) {
 
+    val context = LocalContext.current
+    var clientId by remember { mutableStateOf(0) }
+
     LaunchedEffect(Unit, block = {
-        vm.getAddressList(1)
+        clientId = context.getSharedPreferences("TinyPrefs", Context.MODE_PRIVATE)
+            .getInt("clientId", 0)
+        vm.getAddressList(clientId)
     })
 
     var isRefreshing by remember { mutableStateOf(false) }
@@ -61,7 +68,7 @@ fun AddressList(
     val onRefresh: () -> Unit = {
         isRefreshing = true
         scope.launch {
-            vm.getAddressList(1)
+            vm.getAddressList(clientId)
             isRefreshing = false
         }
     }
@@ -77,23 +84,25 @@ fun AddressList(
                 CenterAlignedTopAppBar(
                     title = {
                         Text(
-                            "Address list",
+                            "Список адресов",
                         )
                     },
                     navigationIcon = {
                         Row {
-                            IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                                Icon(
-                                    imageVector = Icons.Filled.Menu,
-                                    contentDescription = "Menu"
-                                )
-                            }
                             IconButton(onClick = navigateBack) {
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                     contentDescription = "Localized description"
                                 )
                             }
+                        }
+                    },
+                    actions = {
+                        IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                            Icon(
+                                imageVector = Icons.Filled.Menu,
+                                contentDescription = "Menu"
+                            )
                         }
                     }
                 )

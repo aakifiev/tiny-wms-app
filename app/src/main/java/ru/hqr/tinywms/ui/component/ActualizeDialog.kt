@@ -26,7 +26,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import ru.hqr.tinywms.conf.TinyWmsRest
-import ru.hqr.tinywms.dto.client.StockInfo
+import ru.hqr.tinywms.dto.client.StockInfoRequest
 
 @Composable
 fun ActualizeDialog(
@@ -52,12 +52,13 @@ fun ActualizeDialog(
         ) {
             Column(
                 modifier = Modifier
+                    .padding(8.dp)
                     .fillMaxSize(),
                 verticalArrangement = Arrangement.Center,
 //                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
-                    text = "Update stock for ${barcode.value} at ${addressId.value}",
+                    text = "Актуализировать количество для  ${barcode.value} на адресе ${addressId.value}",
                     modifier = Modifier.padding(16.dp),
                 )
                 TextField(
@@ -65,7 +66,7 @@ fun ActualizeDialog(
                     onValueChange = { newText ->
                         quantity.value = newText
                     },
-                    label = { Text("Quantity")}
+                    label = { Text("Количество")}
                 )
                 Row(
                     modifier = Modifier
@@ -76,14 +77,14 @@ fun ActualizeDialog(
                         onClick = { showDialog.value = false },
                         modifier = Modifier.padding(8.dp),
                     ) {
-                        Text("Dismiss")
+                        Text("Отменить")
                     }
                     TextButton(
                         onClick = {
-                            val stockInfo = StockInfo(
-                                barcode.value,
-                                quantity.value.toBigDecimal(),
-                                "UNIT")
+                            val stockInfo = StockInfoRequest(
+                                barcode = barcode.value,
+                                quantity = quantity.value.toBigDecimal(),
+                                measureUnit = "UNIT")
                             rememberCoroutineScope.launch {
                                 TinyWmsRest.retrofitService.actualizeStockInfo(
                                     1,
@@ -100,7 +101,6 @@ fun ActualizeDialog(
 
                                     override fun onFailure(p0: Call<Unit>, p1: Throwable) {
                                         Log.i("onFailure", "onFailure")
-//                response.value = "Error found is : " + p1.message
                                     }
 
                                 })
@@ -110,7 +110,7 @@ fun ActualizeDialog(
                         },
                         modifier = Modifier.padding(8.dp),
                     ) {
-                        Text("Confirm")
+                        Text("Подтвердить")
                     }
                 }
             }

@@ -5,6 +5,7 @@ import ru.hqr.tinywms.dto.client.AddressInfo
 import ru.hqr.tinywms.dto.client.Barcode
 import ru.hqr.tinywms.dto.client.Stock
 import ru.hqr.tinywms.dto.client.StockInfo
+import ru.hqr.tinywms.dto.client.StockInfoRequest
 import ru.hqr.tinywms.dto.client.StockListInfo
 
 class TinyWmsClient : TinyWmsApi {
@@ -38,7 +39,7 @@ class TinyWmsClient : TinyWmsApi {
     override fun actualizeStockInfo(
         client: Int,
         addressId: String,
-        stocks: List<StockInfo>
+        stocks: List<StockInfoRequest>
     ): Call<Unit> {
         TODO("Not yet implemented")
     }
@@ -46,7 +47,7 @@ class TinyWmsClient : TinyWmsApi {
     override fun addStockInfo(
         client: Int,
         addressId: String,
-        stocks: List<StockInfo>
+        stocks: List<StockInfoRequest>
     ): Call<Unit> {
         TODO("Not yet implemented")
     }

@@ -1,14 +1,17 @@
 package ru.hqr.tinywms.ui.compose
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DropdownMenuItem
@@ -17,10 +20,10 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -29,6 +32,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
@@ -37,10 +42,12 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import ru.hqr.tinywms.conf.TinyWmsRest
-import ru.hqr.tinywms.dto.client.StockInfo
+import ru.hqr.tinywms.dto.client.StockInfoRequest
 import ru.hqr.tinywms.ui.component.CustomModalNavigationDrawer
+import ru.hqr.tinywms.ui.component.ScanBarcodeDialog
 import ru.hqr.tinywms.view.AddressListViewModel
 import ru.hqr.tinywms.view.StockListViewModel
+import java.util.concurrent.Executor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,16 +57,21 @@ fun AddStock(
     scope: CoroutineScope,
     vm: AddressListViewModel,
     productListVM: StockListViewModel,
+    executor: Executor,
     navController: NavHostController
 ) {
 
+    val context = LocalContext.current
+    var clientId by remember { mutableStateOf(0) }
     LaunchedEffect(Unit, block = {
-        vm.getAddressList(1)
-        productListVM.getStockList(1)
+        clientId = context.getSharedPreferences("TinyPrefs", Context.MODE_PRIVATE)
+            .getInt("clientId", 0)
+        vm.getAddressList(clientId)
+        productListVM.getStockList(clientId)
     })
 
     var searchQuery by remember { mutableStateOf("") }
-    var barcodeSearchQuery by remember { mutableStateOf("") }
+    var barcodeSearchQuery = remember { mutableStateOf("") }
 
     val quantity = remember {
         mutableStateOf("")
@@ -75,6 +87,12 @@ fun AddStock(
 
     val rememberCoroutineScope = rememberCoroutineScope()
 
+    val showDialog = remember {
+        mutableStateOf(false)
+    }
+    ScanBarcodeDialog(showDialog = showDialog, executorHs = executor,
+        barcodeResult = barcodeSearchQuery)
+
     CustomModalNavigationDrawer(
         drawerState = drawerState,
         scope = scope,
@@ -86,23 +104,25 @@ fun AddStock(
                 CenterAlignedTopAppBar(
                     title = {
                         Text(
-                            "Add stock",
+                            "Добавить товар",
                         )
                     },
                     navigationIcon = {
                         Row {
-                            IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                                Icon(
-                                    imageVector = Icons.Filled.Menu,
-                                    contentDescription = "Menu"
-                                )
-                            }
                             IconButton(onClick = navigateBack) {
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                     contentDescription = "Localized description"
                                 )
                             }
+                        }
+                    },
+                    actions = {
+                        IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                            Icon(
+                                imageVector = Icons.Filled.Menu,
+                                contentDescription = "Menu"
+                            )
                         }
                     }
                 )
@@ -123,29 +143,35 @@ fun AddStock(
                     }
                 }
                 val productFilteredItems = remember(barcodeSearchQuery, productListVM.stocks) {
-                    if (barcodeSearchQuery.length < 3) {
+                    if (barcodeSearchQuery.value.length < 3) {
                         productListVM.stocks
                     } else {
                         productListVM.stocks.filter { item ->
-                            item.barcode.contains(barcodeSearchQuery, ignoreCase = true) ||
-                                    item.title.contains(barcodeSearchQuery, ignoreCase = true)
+                            item.barcode.contains(barcodeSearchQuery.value, ignoreCase = true) ||
+                                    item.title.contains(barcodeSearchQuery.value, ignoreCase = true)
                         }
                     }
                 }
 
                 ExposedDropdownMenuBox(
+                    modifier = Modifier.padding(8.dp),
                     expanded = addressMenuExpanded.value,
                     onExpandedChange = {},
                 ) {
-                    TextField(
-                        label = { Text("Select address") },
+                    OutlinedTextField(
+                        label = { Text("Выбор адреса") },
                         trailingIcon = {},
                         value = searchQuery,
                         onValueChange = {
                             searchQuery = it
                             addressMenuExpanded.value = searchQuery.length > 2
                         },
-                        modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryEditable, true)
+                        singleLine = true,
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .fillMaxWidth()
+                            .menuAnchor(MenuAnchorType.PrimaryEditable, true)
                     )
                     ExposedDropdownMenu(
                         expanded = addressMenuExpanded.value,
@@ -165,18 +191,37 @@ fun AddStock(
                 }
 
                 ExposedDropdownMenuBox(
+                    modifier = Modifier.padding(8.dp),
                     expanded = barcodeMenuExpanded.value,
                     onExpandedChange = {},
                 ) {
-                    TextField(
-                        label = { Text("Select barcode") },
+                    OutlinedTextField(
+                        label = { Text("Выбрать товар") },
                         trailingIcon = {},
-                        value = barcodeSearchQuery,
+                        value = barcodeSearchQuery.value,
                         onValueChange = {
-                            barcodeSearchQuery = it
-                            barcodeMenuExpanded.value = barcodeSearchQuery.length > 2
+                            barcodeSearchQuery.value = it
+                            barcodeMenuExpanded.value = barcodeSearchQuery.value.length > 2
                         },
-                        modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryEditable, true)
+                        singleLine = true,
+                        shape = RoundedCornerShape(12.dp),
+                        leadingIcon = {
+                            IconButton(
+                                onClick = {
+                                    showDialog.value = true
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Search,
+                                    contentDescription = "Clear Icon",
+                                    tint = Color.Gray
+                                )
+                            }
+                        },
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .fillMaxWidth()
+                            .menuAnchor(MenuAnchorType.PrimaryEditable, true)
                     )
                     ExposedDropdownMenu(
                         expanded = barcodeMenuExpanded.value,
@@ -187,7 +232,7 @@ fun AddStock(
                                 text = { Text("${it.barcode} : ${it.title}") },
                                 onClick = {
                                     Log.i("DropdownMenuItem", "DropdownMenuItemEdit")
-                                    barcodeSearchQuery = it.barcode
+                                    barcodeSearchQuery.value = it.barcode
                                     barcodeMenuExpanded.value = false
                                 }
                             )
@@ -195,13 +240,18 @@ fun AddStock(
                     }
                 }
 
-                TextField(
-                    label = { Text("Enter quantity") },
+                OutlinedTextField(
+                    label = { Text("Укажите количество") },
                     trailingIcon = {},
                     value = quantity.value,
                     onValueChange = {
                         quantity.value = it
-                    }
+                    },
+                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth()
                 )
 
                 Row(
@@ -210,21 +260,24 @@ fun AddStock(
                     horizontalArrangement = Arrangement.Center,
                 ) {
                     TextButton(
-                        onClick = { },
-                        modifier = Modifier.padding(8.dp),
-                    ) {
-                        Text("Dismiss")
-                    }
-                    TextButton(
                         onClick = {
-                            val stockInfo = StockInfo(
-                                barcodeSearchQuery,
+                            if (searchQuery.isBlank()) {
+                                return@TextButton
+                            }
+                            if (barcodeSearchQuery.value.isBlank()) {
+                                return@TextButton
+                            }
+                            if (quantity.value.isBlank()) {
+                                return@TextButton
+                            }
+                            val stockInfo = StockInfoRequest(
+                                barcodeSearchQuery.value,
                                 quantity.value.toBigDecimal(),
                                 "UNIT"
                             )
                             rememberCoroutineScope.launch {
                                 TinyWmsRest.retrofitService.addStockInfo(
-                                    1,
+                                    clientId,
                                     searchQuery,
                                     listOf(stockInfo)
                                 ).enqueue(object : Callback<Unit> {
@@ -233,19 +286,21 @@ fun AddStock(
                                         p1: Response<Unit>
                                     ) {
                                         Log.i("onResponse", p1.toString())
-//                                        clientId.intValue = getClientId(sharedPreferences)
-//                                        response.value = p1.body()!!
+                                        navController.navigate("stockList")
                                     }
 
-                                    override fun onFailure(p0: Call<Unit>, p1: Throwable) { Log.i("onFailure", "onFailure")
+                                    override fun onFailure(p0: Call<Unit>, p: Throwable) {
+                                        Log.i("onFailure", "onFailure")
                                     }
 
                                 })
                             }
                         },
-                        modifier = Modifier.padding(8.dp),
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .fillMaxWidth(),
                     ) {
-                        Text("Confirm")
+                        Text("Сохранить")
                     }
                 }
             }

@@ -4,5 +4,6 @@ import java.math.BigDecimal
 
 data class StockInfo(
     val barcode: String,
+    val title: String,
     val quantity: BigDecimal,
     val measureUnit: String)

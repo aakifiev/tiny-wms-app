@@ -2,11 +2,10 @@ package ru.hqr.tinywms.client
 
 import retrofit2.Call
 import retrofit2.http.GET
-import retrofit2.http.Query
-import ru.hqr.tinywms.dto.client.EmployeeClientId
+import retrofit2.http.Header
 
 interface EmployeeWmsApi {
 
-    @GET("/employees")
-    fun findEmployee(@Query("user") user: String, @Query("pwd") pwd: String): Call<EmployeeClientId>
+    @GET("/employees:login")
+    fun findEmployee(@Header("user") user: String, @Header("pwd") pwd: String): Call<Int>
 }

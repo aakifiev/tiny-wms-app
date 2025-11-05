@@ -9,6 +9,7 @@ import ru.hqr.tinywms.dto.client.AddressInfo
 import ru.hqr.tinywms.dto.client.Barcode
 import ru.hqr.tinywms.dto.client.Stock
 import ru.hqr.tinywms.dto.client.StockInfo
+import ru.hqr.tinywms.dto.client.StockInfoRequest
 import ru.hqr.tinywms.dto.client.StockListInfo
 
 interface TinyWmsApi {
@@ -40,13 +41,13 @@ interface TinyWmsApi {
     fun actualizeStockInfo(
         @Path("client") client: Int,
         @Path("addressId") addressId: String,
-        @Body stocks: List<StockInfo>
+        @Body stocks: List<StockInfoRequest>
     ): Call<Unit>
 
     @POST("/stocks/clients/{client}/addresses/{addressId}/add")
     fun addStockInfo(
         @Path("client") client: Int,
         @Path("addressId") addressId: String,
-        @Body stocks: List<StockInfo>
+        @Body stocks: List<StockInfoRequest>
     ): Call<Unit>
 }

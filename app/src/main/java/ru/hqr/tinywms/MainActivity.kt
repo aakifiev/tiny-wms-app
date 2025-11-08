@@ -16,6 +16,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import ru.hqr.tinywms.ui.compose.AddBarcodeInfo
 import ru.hqr.tinywms.ui.compose.AddStock
 import ru.hqr.tinywms.ui.compose.AddressList
 import ru.hqr.tinywms.ui.compose.CameraScreen
@@ -66,7 +67,7 @@ class MainActivity : ComponentActivity() {
             val scope = rememberCoroutineScope()
             TinyWmsTheme {
                 val navController = rememberNavController()
-                NavHost(navController, startDestination = "addStock") {
+                NavHost(navController, startDestination = "addBarcodeInfo") {
                     composable("home") {
                         HomeScreen(
                             executorHs = cameraExecutor,
@@ -118,6 +119,17 @@ class MainActivity : ComponentActivity() {
                     }
                     composable("addStock") {
                         AddStock(
+                            navigateBack = {
+                                navController.popBackStack()
+                            },
+                            drawerState, scope,
+                            addressListVM, productListVM,
+                            cameraExecutor,
+                            navController
+                        )
+                    }
+                    composable("addBarcodeInfo") {
+                        AddBarcodeInfo(
                             navigateBack = {
                                 navController.popBackStack()
                             },

@@ -14,6 +14,10 @@ class TinyWmsClient : TinyWmsApi {
         TODO("Not yet implemented")
     }
 
+    override fun createBarcode(barcode: Barcode): Call<Unit> {
+        TODO("Not yet implemented")
+    }
+
     override fun findStocks(client: Int): Call<List<Stock>> {
         TODO("Not yet implemented")
     }

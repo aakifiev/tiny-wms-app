@@ -41,7 +41,7 @@ fun CustomModalNavigationDrawer(
                     }
                 )
                 NavigationDrawerItem(
-                    label = { Text(text = "stock list", color = Color.Black) },
+                    label = { Text(text = "Список товаров", color = Color.Black) },
                     selected = false,
                     onClick = {
                         navController.navigate("stockList")
@@ -49,7 +49,7 @@ fun CustomModalNavigationDrawer(
                     }
                 )
                 NavigationDrawerItem(
-                    label = { Text(text = "Address list", color = Color.Black) },
+                    label = { Text(text = "Список адресов", color = Color.Black) },
                     selected = false,
                     onClick = {
                         navController.navigate("addressList")
@@ -57,10 +57,18 @@ fun CustomModalNavigationDrawer(
                     }
                 )
                 NavigationDrawerItem(
-                    label = { Text(text = "Add stock", color = Color.Black) },
+                    label = { Text(text = "Добавить товар", color = Color.Black) },
                     selected = false,
                     onClick = {
                         navController.navigate("addStock")
+                        scope.launch { drawerState.close() }
+                    }
+                )
+                NavigationDrawerItem(
+                    label = { Text(text = "Добавить информацию о товаре", color = Color.Black) },
+                    selected = false,
+                    onClick = {
+                        navController.navigate("addBarcodeInfo")
                         scope.launch { drawerState.close() }
                     }
                 )

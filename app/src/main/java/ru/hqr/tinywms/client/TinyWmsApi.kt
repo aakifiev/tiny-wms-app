@@ -17,6 +17,9 @@ interface TinyWmsApi {
     @GET("/barcodes/{barcode}")
     fun findBarcode(@Path("barcode") barcode: String): Call<Barcode>
 
+    @POST("/barcodes")
+    fun createBarcode(@Body barcode: Barcode): Call<Unit>
+
     @GET("/stocks/clients/{client}/products")
     fun findStocks(@Path("client") client: Int): Call<List<Stock>>
 

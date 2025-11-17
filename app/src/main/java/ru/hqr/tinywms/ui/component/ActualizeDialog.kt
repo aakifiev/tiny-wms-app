@@ -9,9 +9,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -81,13 +81,13 @@ fun ActualizeDialog(
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center,
                 ) {
-                    TextButton(
+                    Button(
                         onClick = { showDialog.value = false },
                         modifier = Modifier.padding(8.dp),
                     ) {
                         Text("Отменить")
                     }
-                    TextButton(
+                    Button(
                         onClick = {
                             val stockInfo = StockInfoRequest(
                                 barcode = barcode.value,

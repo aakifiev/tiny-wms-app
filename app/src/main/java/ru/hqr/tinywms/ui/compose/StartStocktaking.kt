@@ -4,14 +4,15 @@ import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DrawerState
@@ -27,12 +28,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -44,54 +45,48 @@ import retrofit2.Response
 import ru.hqr.tinywms.conf.TinyWmsRest
 import ru.hqr.tinywms.dto.client.StockInfoRequest
 import ru.hqr.tinywms.ui.component.CustomModalNavigationDrawer
-import ru.hqr.tinywms.ui.component.ScanBarcodeDialog
+import ru.hqr.tinywms.ui.component.InventoryDialog
+import ru.hqr.tinywms.ui.component.MessageInventoryRow
 import ru.hqr.tinywms.view.AddressListViewModel
-import ru.hqr.tinywms.view.StockListViewModel
+import java.math.BigDecimal
 import java.util.concurrent.Executor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddStock(
+fun StartStocktaking(
     navigateBack: () -> Unit,
     drawerState: DrawerState,
     scope: CoroutineScope,
     vm: AddressListViewModel,
-    productListVM: StockListViewModel,
     executor: Executor,
     navController: NavHostController
 ) {
 
     val context = LocalContext.current
     var clientId by remember { mutableStateOf(0) }
+    val rememberCoroutineScope = rememberCoroutineScope()
+
     LaunchedEffect(Unit, block = {
         clientId = context.getSharedPreferences("TinyPrefs", Context.MODE_PRIVATE)
             .getInt("clientId", 0)
         vm.getAddressList(clientId)
-        productListVM.getStockList(clientId)
     })
-
-    var searchQuery by remember { mutableStateOf("") }
-    var barcodeSearchQuery = remember { mutableStateOf("") }
-
-    val quantity = remember {
-        mutableStateOf("")
-    }
 
     val addressMenuExpanded = remember {
         mutableStateOf(false)
     }
 
-    val barcodeMenuExpanded = remember {
-        mutableStateOf(false)
-    }
-
-    val rememberCoroutineScope = rememberCoroutineScope()
+    var searchQuery by remember { mutableStateOf("") }
 
     val showDialog = remember {
         mutableStateOf(false)
     }
-    ScanBarcodeDialog(showDialog = showDialog, executorHs = executor,
-        barcodeResult = barcodeSearchQuery)
+
+    val filteredItems = remember { mutableStateMapOf<String, Short>() }
+    InventoryDialog(
+        showDialog = showDialog, executorHs = executor,
+        filteredItemsResult = filteredItems
+    )
 
     CustomModalNavigationDrawer(
         drawerState = drawerState,
@@ -104,7 +99,7 @@ fun AddStock(
                 CenterAlignedTopAppBar(
                     title = {
                         Text(
-                            "Добавить товар",
+                            "Старт инвентаризации",
                         )
                     },
                     navigationIcon = {
@@ -132,8 +127,7 @@ fun AddStock(
                 Modifier
                     .padding(padding)
             ) {
-
-                val filteredItems = remember(searchQuery, vm.addresses) {
+                val addressFilteredItems = remember(searchQuery, vm.addresses) {
                     if (searchQuery.length < 3) {
                         vm.addresses
                     } else {
@@ -142,17 +136,6 @@ fun AddStock(
                         }
                     }
                 }
-                val productFilteredItems = remember(barcodeSearchQuery, productListVM.stocks) {
-                    if (barcodeSearchQuery.value.length < 3) {
-                        productListVM.stocks
-                    } else {
-                        productListVM.stocks.filter { item ->
-                            item.barcode.contains(barcodeSearchQuery.value, ignoreCase = true) ||
-                                    item.title.contains(barcodeSearchQuery.value, ignoreCase = true)
-                        }
-                    }
-                }
-
                 ExposedDropdownMenuBox(
                     modifier = Modifier.padding(8.dp),
                     expanded = addressMenuExpanded.value,
@@ -177,7 +160,7 @@ fun AddStock(
                         expanded = addressMenuExpanded.value,
                         onDismissRequest = { addressMenuExpanded.value = false },
                     ) {
-                        filteredItems.forEach {
+                        addressFilteredItems.forEach {
                             DropdownMenuItem(
                                 text = { Text(it) },
                                 onClick = {
@@ -189,71 +172,15 @@ fun AddStock(
                         }
                     }
                 }
-
-                ExposedDropdownMenuBox(
-                    modifier = Modifier.padding(8.dp),
-                    expanded = barcodeMenuExpanded.value,
-                    onExpandedChange = {},
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    OutlinedTextField(
-                        label = { Text("Выбрать товар") },
-                        trailingIcon = {},
-                        value = barcodeSearchQuery.value,
-                        onValueChange = {
-                            barcodeSearchQuery.value = it
-                            barcodeMenuExpanded.value = barcodeSearchQuery.value.length > 2
-                        },
-                        singleLine = true,
-                        shape = RoundedCornerShape(12.dp),
-                        leadingIcon = {
-                            IconButton(
-                                onClick = {
-                                    showDialog.value = true
-                                }
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Search,
-                                    contentDescription = "Clear Icon",
-                                    tint = Color.Gray
-                                )
-                            }
-                        },
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .fillMaxWidth()
-                            .menuAnchor(MenuAnchorType.PrimaryEditable, true)
-                    )
-                    ExposedDropdownMenu(
-                        expanded = barcodeMenuExpanded.value,
-                        onDismissRequest = { barcodeMenuExpanded.value = false },
-                    ) {
-                        productFilteredItems.forEach {
-                            DropdownMenuItem(
-                                text = { Text("${it.barcode} : ${it.title}") },
-                                onClick = {
-                                    Log.i("DropdownMenuItem", "DropdownMenuItemEdit")
-                                    barcodeSearchQuery.value = it.barcode
-                                    barcodeMenuExpanded.value = false
-                                }
-                            )
-                        }
+                    filteredItems.forEach { elem ->
+                        item { MessageInventoryRow(elem.key, elem.value) }
                     }
                 }
-
-                OutlinedTextField(
-                    label = { Text("Укажите количество") },
-                    trailingIcon = {},
-                    value = quantity.value,
-                    onValueChange = {
-                        quantity.value = it
-                    },
-                    singleLine = true,
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .fillMaxWidth()
-                )
-
                 Row(
                     modifier = Modifier
                         .fillMaxWidth(),
@@ -261,47 +188,51 @@ fun AddStock(
                 ) {
                     Button(
                         onClick = {
-                            if (searchQuery.isBlank()) {
-                                return@Button
-                            }
-                            if (barcodeSearchQuery.value.isBlank()) {
-                                return@Button
-                            }
-                            if (quantity.value.isBlank()) {
-                                return@Button
-                            }
-                            val stockInfo = StockInfoRequest(
-                                barcodeSearchQuery.value,
-                                quantity.value.toBigDecimal(),
-                                "UNIT"
-                            )
-                            rememberCoroutineScope.launch {
-                                TinyWmsRest.retrofitService.addStockInfo(
-                                    clientId,
-                                    searchQuery,
-                                    listOf(stockInfo)
-                                ).enqueue(object : Callback<Unit> {
-                                    override fun onResponse(
-                                        p0: Call<Unit>,
-                                        p1: Response<Unit>
-                                    ) {
-                                        Log.i("onResponse", p1.toString())
-                                        navController.navigate("stockList")
-                                    }
-
-                                    override fun onFailure(p0: Call<Unit>, p: Throwable) {
-                                        Log.i("onFailure", "onFailure")
-                                    }
-
-                                })
-                            }
+                            showDialog.value = true
                         },
                         modifier = Modifier
                             .padding(8.dp)
                             .fillMaxWidth(),
                     ) {
-                        Text("Сохранить")
+                        Text("Старт")
                     }
+                }
+                Button(
+                    onClick = {
+                        val stockInfoListRequest = filteredItems.map {
+                            StockInfoRequest(
+                                it.key,
+                                BigDecimal(it.value.toInt()),
+                                "UNIT"
+                            )
+                        }
+                        rememberCoroutineScope.launch {
+                            TinyWmsRest.retrofitService.addStockInfo(
+                                clientId,
+                                searchQuery,
+                                stockInfoListRequest
+                            ).enqueue(object : Callback<Unit> {
+                                override fun onResponse(
+                                    p0: Call<Unit>,
+                                    p1: Response<Unit>
+                                ) {
+                                    Log.i("onResponse", p1.toString())
+                                    navController.navigate("stockList")
+//                                        clientId.intValue = getClientId(sharedPreferences)
+//                                        response.value = p1.body()!!
+                                }
+
+                                override fun onFailure(p0: Call<Unit>, p1: Throwable) {
+                                    Log.i("onFailure", "onFailure")
+                                }
+
+                            })
+                        }
+
+                    },
+                    modifier = Modifier.padding(8.dp),
+                ) {
+                    Text("Подтвердить")
                 }
             }
         }

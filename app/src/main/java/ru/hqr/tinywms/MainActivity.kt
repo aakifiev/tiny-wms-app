@@ -23,6 +23,7 @@ import ru.hqr.tinywms.ui.compose.CameraScreen
 import ru.hqr.tinywms.ui.compose.HomeScreen
 import ru.hqr.tinywms.ui.compose.LoginPage
 import ru.hqr.tinywms.ui.compose.ProductInfo
+import ru.hqr.tinywms.ui.compose.StartStocktaking
 import ru.hqr.tinywms.ui.compose.StockInfoList
 import ru.hqr.tinywms.ui.compose.StockList
 import ru.hqr.tinywms.ui.theme.TinyWmsTheme
@@ -67,7 +68,7 @@ class MainActivity : ComponentActivity() {
             val scope = rememberCoroutineScope()
             TinyWmsTheme {
                 val navController = rememberNavController()
-                NavHost(navController, startDestination = "addBarcodeInfo") {
+                NavHost(navController, startDestination = "loginPage") {
                     composable("home") {
                         HomeScreen(
                             executorHs = cameraExecutor,
@@ -153,6 +154,14 @@ class MainActivity : ComponentActivity() {
                             navigateBack = {
                                 navController.popBackStack()
                             })
+                    }
+                    composable("StartStocktaking") {
+                        StartStocktaking(
+                            navigateBack = {
+                                navController.popBackStack()
+                            },
+                            drawerState, scope, addressListVM,
+                            cameraExecutor, navController)
                     }
                 }
             }

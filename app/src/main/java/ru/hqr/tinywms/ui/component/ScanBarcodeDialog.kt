@@ -2,7 +2,6 @@ package ru.hqr.tinywms.ui.component
 
 import android.util.Log
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -34,7 +33,7 @@ fun ScanBarcodeDialog(
                 .fillMaxWidth(),
             shape = RoundedCornerShape(16.dp)
         ) {
-            Spacer(modifier = Modifier.height(40.dp))
+//            Spacer(modifier = Modifier.height(40.dp))
             Box(modifier = Modifier
                 .fillMaxWidth(fraction = 0.9f)
                 .height(360.dp)

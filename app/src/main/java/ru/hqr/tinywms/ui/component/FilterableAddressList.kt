@@ -38,7 +38,7 @@ fun FilterableAddressList(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(filteredItems) { addressId ->
-            MessageRow(
+            MessageAddressRow(
                 addressId,
                 onClick = { onStockInfoClick(addressId) })
         }
@@ -47,7 +47,7 @@ fun FilterableAddressList(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun MessageRow(
+fun MessageAddressRow(
     message: String, onClick: () -> Unit
 ) {
 //    Card (modifier = Modifier.padding().fillMaxWidth(),

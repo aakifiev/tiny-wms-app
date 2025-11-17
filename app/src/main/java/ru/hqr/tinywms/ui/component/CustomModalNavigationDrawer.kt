@@ -72,6 +72,14 @@ fun CustomModalNavigationDrawer(
                         scope.launch { drawerState.close() }
                     }
                 )
+                NavigationDrawerItem(
+                    label = { Text(text = "Инвентаризация", color = Color.Black) },
+                    selected = false,
+                    onClick = {
+                        navController.navigate("startStocktaking")
+                        scope.launch { drawerState.close() }
+                    }
+                )
             }
         },
         content = content

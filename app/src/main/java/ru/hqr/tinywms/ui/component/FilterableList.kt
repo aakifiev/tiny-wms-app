@@ -34,7 +34,7 @@ fun FilterableList(
         }
     }
 
-    LazyColumn (
+    LazyColumn(
         modifier = Modifier.fillMaxWidth(),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -52,20 +52,18 @@ fun FilterableList(
 fun MessageRow(
     message: Stock, onClick: () -> Unit
 ) {
-//    Card (modifier = Modifier.padding().fillMaxWidth(),
-//
-//        onClick = onClick) {
-        Column(
-            modifier = Modifier.padding(8.dp).fillMaxWidth()
-                .combinedClickable(
-                    onClick = onClick,
-                    onLongClick = {}
-                ),
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text("Штрихкод: ${message.barcode}")
-            Text("Наименование: ${message.title}")
-            HorizontalDivider()
-        }
-//    }
+    Column(
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth()
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = {}
+            ),
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text("Штрихкод: ${message.barcode}")
+        Text("Наименование: ${message.title}")
+        HorizontalDivider()
+    }
 }

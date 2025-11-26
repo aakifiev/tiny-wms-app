@@ -20,22 +20,30 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import ru.hqr.tinywms.conf.TinyWmsRest
+import ru.hqr.tinywms.dto.client.Barcode
 import java.util.concurrent.Executor
 
 @Composable
 fun InventoryDialog(
     showDialog: MutableState<Boolean>,
     executorHs: Executor,
-    filteredItemsResult: MutableMap<String, Short>
+    filteredItemsResult: MutableMap<Barcode, Short>
 ) {
-    val filteredItems = remember { mutableStateMapOf<String, Short>() }
+    val filteredItems = remember { mutableStateMapOf<Barcode, Short>() }
     val isScan = remember { mutableStateOf(false) }
     val buttonScanText = remember { mutableStateOf("Сканировать") }
+    val rememberCoroutineScope = rememberCoroutineScope()
     if (!showDialog.value) return
     Dialog(
         onDismissRequest = {
@@ -63,12 +71,25 @@ fun InventoryDialog(
                     },
                     onCatchBarcode = { barcode ->
                         if (isScan.value) {
-                            filteredItems.merge(barcode, 1)
-                            { oldVal, newVal -> (newVal + oldVal).toShort() }
-                            isScan.value = false
-                            buttonScanText.value = "Сканировать"
+                            rememberCoroutineScope.launch {
+                                val result = TinyWmsRest.retrofitService.findBarcode(barcode)
+                                result!!.enqueue(object : Callback<Barcode?> {
+                                    override fun onResponse(
+                                        p0: Call<Barcode?>,
+                                        p1: Response<Barcode?>
+                                    ) {
+                                        filteredItems.merge(p1.body()!!, 1)
+                                        { oldVal, newVal -> (newVal + oldVal).toShort() }
+                                        isScan.value = false
+                                        buttonScanText.value = "Сканировать"
+                                    }
+
+                                    override fun onFailure(p0: Call<Barcode?>, p1: Throwable) {
+                                        Log.i("", "onFailure: ")
+                                    }
+                                })
+                            }
                         }
-//                        showDialog.value = false
                     })
 
             }
@@ -94,7 +115,7 @@ fun InventoryDialog(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 filteredItems.forEach { elem ->
-                    item { MessageInventoryRow(elem.key, elem.value) }
+                    item { MessageInventoryRow(elem.key.title, elem.value) }
                 }
             }
             Button(

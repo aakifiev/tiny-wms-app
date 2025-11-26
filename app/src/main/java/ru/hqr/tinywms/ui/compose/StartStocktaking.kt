@@ -43,6 +43,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import ru.hqr.tinywms.conf.TinyWmsRest
+import ru.hqr.tinywms.dto.client.Barcode
 import ru.hqr.tinywms.dto.client.StockInfoRequest
 import ru.hqr.tinywms.ui.component.CustomModalNavigationDrawer
 import ru.hqr.tinywms.ui.component.InventoryDialog
@@ -82,7 +83,7 @@ fun StartStocktaking(
         mutableStateOf(false)
     }
 
-    val filteredItems = remember { mutableStateMapOf<String, Short>() }
+    val filteredItems = remember { mutableStateMapOf<Barcode, Short>() }
     InventoryDialog(
         showDialog = showDialog, executorHs = executor,
         filteredItemsResult = filteredItems
@@ -178,7 +179,7 @@ fun StartStocktaking(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     filteredItems.forEach { elem ->
-                        item { MessageInventoryRow(elem.key, elem.value) }
+                        item { MessageInventoryRow(elem.key.title, elem.value) }
                     }
                 }
                 Row(
@@ -201,7 +202,7 @@ fun StartStocktaking(
                     onClick = {
                         val stockInfoListRequest = filteredItems.map {
                             StockInfoRequest(
-                                it.key,
+                                it.key.barcode,
                                 BigDecimal(it.value.toInt()),
                                 "UNIT"
                             )
@@ -218,8 +219,6 @@ fun StartStocktaking(
                                 ) {
                                     Log.i("onResponse", p1.toString())
                                     navController.navigate("stockList")
-//                                        clientId.intValue = getClientId(sharedPreferences)
-//                                        response.value = p1.body()!!
                                 }
 
                                 override fun onFailure(p0: Call<Unit>, p1: Throwable) {

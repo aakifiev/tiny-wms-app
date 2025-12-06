@@ -72,6 +72,8 @@ dependencies {
 
     implementation("androidx.navigation:navigation-compose:2.8.3")
 
+    implementation("androidx.biometric:biometric:1.2.0-alpha05")
+
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.vision.common)
@@ -81,7 +83,9 @@ dependencies {
 //    implementation("androidx.compose.material:material:1.7.5")
     implementation("androidx.compose.material3:material3:1.3.1")
     implementation(libs.material)
-
+// DataStore
+    implementation("androidx.datastore:datastore-preferences:1.2.0")
+    implementation("androidx.datastore:datastore-preferences-core:1.2.0")
 //    runtimeOnly("com.google.mlkit:barcode-scanning:17.3.0")
 
     testImplementation(libs.junit)

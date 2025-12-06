@@ -1,5 +1,6 @@
 package ru.hqr.tinywms
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -13,9 +14,15 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
+import androidx.fragment.app.FragmentActivity
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import ru.hqr.tinywms.biometric.BiometricPreferences
 import ru.hqr.tinywms.ui.compose.AddBarcodeInfo
 import ru.hqr.tinywms.ui.compose.AddStock
 import ru.hqr.tinywms.ui.compose.AddressList
@@ -26,6 +33,8 @@ import ru.hqr.tinywms.ui.compose.ProductInfo
 import ru.hqr.tinywms.ui.compose.StartStocktaking
 import ru.hqr.tinywms.ui.compose.StockInfoList
 import ru.hqr.tinywms.ui.compose.StockList
+import ru.hqr.tinywms.ui.signin.SignInScreen
+import ru.hqr.tinywms.ui.signup.SignUpScreen
 import ru.hqr.tinywms.ui.theme.TinyWmsTheme
 import ru.hqr.tinywms.util.mainactivity.startCamera
 import ru.hqr.tinywms.util.mainactivity.stopCamera
@@ -35,7 +44,7 @@ import ru.hqr.tinywms.view.StockInfoListViewModel
 import ru.hqr.tinywms.view.StockListViewModel
 import java.util.concurrent.ExecutorService
 
-class MainActivity : ComponentActivity() {
+class MainActivity : FragmentActivity() {
 
     lateinit var cameraExecutor: ExecutorService;
     val identifier = "[MainActivity]"
@@ -68,7 +77,13 @@ class MainActivity : ComponentActivity() {
             val scope = rememberCoroutineScope()
             TinyWmsTheme {
                 val navController = rememberNavController()
-                NavHost(navController, startDestination = "loginPage") {
+                NavHost(navController, startDestination = "signin") {
+                    composable ("signin") {
+                        SignInScreen(navController)
+                    }
+                    composable ("signup") {
+                        SignUpScreen(navController)
+                    }
                     composable("home") {
                         HomeScreen(
                             executorHs = cameraExecutor,

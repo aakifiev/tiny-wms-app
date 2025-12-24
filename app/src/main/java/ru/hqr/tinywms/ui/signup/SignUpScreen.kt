@@ -35,6 +35,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.navigation.NavHostController
 import ru.hqr.tinywms.biometric.BiometricHelper
 import ru.hqr.tinywms.biometric.BiometricPreferences
+import ru.hqr.tinywms.type.NavRoute
 import ru.hqr.tinywms.ui.component.CustomOutlinedTextField
 import ru.hqr.tinywms.ui.component.EnableBiometricDialog
 
@@ -42,7 +43,6 @@ import ru.hqr.tinywms.ui.component.EnableBiometricDialog
 fun SignUpScreen(navController: NavHostController) {
     val context = LocalContext.current as FragmentActivity
     val isBiometricAvailable = remember { BiometricHelper.isBiometricAvailable(context) }
-//    val viewModel = SignUpScreenViewModel(BiometricPreferences(context))
     val viewModel = remember { SignUpScreenViewModel(BiometricPreferences(context)) }
     val emailId by viewModel.emailId.collectAsState()
     val password by viewModel.password.collectAsState()
@@ -51,7 +51,7 @@ fun SignUpScreen(navController: NavHostController) {
     val isPasswordError = state is SignUpState.InvalidPassword
     val isConfirmPasswordError = state is SignUpState.InvalidConfirmPassword
     val isEmailError = state is SignUpState.InvalidEmailId
-    var showBiometricEnableDialog by remember { mutableStateOf(true) }
+    var showBiometricEnableDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(key1 = state) {
         if (state is SignUpState.SUCCESS) {
@@ -66,15 +66,15 @@ fun SignUpScreen(navController: NavHostController) {
                     BiometricHelper.registerUserBiometrics(context) {
                         showBiometricEnableDialog = false
                         viewModel.setBiometricEnabled(true)
-                        navController.navigate("stockList")
+                        navController.navigate(NavRoute.STOCK_LIST.name)
                     }
                 },
                 {
-                    navController.navigate("stockList")
+                    navController.navigate(NavRoute.STOCK_LIST.name)
                 }
             )
         } else {
-            navController.navigate("stockList")
+            navController.navigate(NavRoute.STOCK_LIST.name)
         }
     }
 

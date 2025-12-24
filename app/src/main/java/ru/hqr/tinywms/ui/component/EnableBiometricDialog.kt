@@ -15,7 +15,7 @@ fun EnableBiometricDialog(
         title = { },
         text = {
 //            Text(text = stringResource(R.string.enable_biometric_dialog_title_text))
-            Text(text = "enable biometric")
+            Text(text = "Enable biometric")
         },
         confirmButton = {
             Button(onClick = {

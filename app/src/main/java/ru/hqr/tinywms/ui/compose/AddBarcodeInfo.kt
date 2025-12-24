@@ -40,6 +40,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import ru.hqr.tinywms.conf.TinyWmsRest
 import ru.hqr.tinywms.dto.client.Barcode
+import ru.hqr.tinywms.type.NavRoute
 import ru.hqr.tinywms.ui.component.CustomModalNavigationDrawer
 import ru.hqr.tinywms.ui.component.ScanBarcodeDialog
 import ru.hqr.tinywms.view.AddressListViewModel
@@ -193,7 +194,7 @@ fun AddBarcodeInfo(
                                         p1: Response<Unit>
                                     ) {
                                         Log.i("onResponse", p1.toString())
-                                        navController.navigate("stockList")
+                                        navController.navigate(NavRoute.STOCK_LIST.name)
                                     }
 
                                     override fun onFailure(p0: Call<Unit>, p: Throwable) {

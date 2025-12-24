@@ -44,11 +44,14 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import ru.hqr.tinywms.conf.EmployeeWmsRest
+import ru.hqr.tinywms.type.NavRoute
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginPage(navController: NavHostController,
-              navigateBack: () -> Unit) {
+fun LoginPage(
+    navController: NavHostController,
+    navigateBack: () -> Unit
+) {
 
     Scaffold(
         topBar = {
@@ -151,9 +154,11 @@ fun LoginPage(navController: NavHostController,
                         email.value.text.isEmpty() -> {
                             emailErrorState.value = true
                         }
+
                         password.value.text.isEmpty() -> {
                             passwordErrorState.value = true
                         }
+
                         else -> {
                             passwordErrorState.value = false
                             emailErrorState.value = false
@@ -164,12 +169,10 @@ fun LoginPage(navController: NavHostController,
                                 .enqueue(object : Callback<Int?> {
                                     override fun onResponse(p0: Call<Int?>, p1: Response<Int?>) {
                                         p1.body()?.let {
-                                            if (it != null) {
-                                                sharedPreferences.edit {
-                                                    putInt("clientId", it)
-                                                }
-                                                navController.navigate("stockList")
+                                            sharedPreferences.edit {
+                                                putInt("clientId", it)
                                             }
+                                            navController.navigate(NavRoute.STOCK_LIST.name)
                                         }
                                     }
 

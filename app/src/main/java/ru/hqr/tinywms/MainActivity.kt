@@ -1,9 +1,7 @@
 package ru.hqr.tinywms
 
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
@@ -14,15 +12,11 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.platform.LocalContext
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.preferencesDataStore
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import ru.hqr.tinywms.biometric.BiometricPreferences
+import ru.hqr.tinywms.type.NavRoute
 import ru.hqr.tinywms.ui.compose.AddBarcodeInfo
 import ru.hqr.tinywms.ui.compose.AddStock
 import ru.hqr.tinywms.ui.compose.AddressList
@@ -77,14 +71,14 @@ class MainActivity : FragmentActivity() {
             val scope = rememberCoroutineScope()
             TinyWmsTheme {
                 val navController = rememberNavController()
-                NavHost(navController, startDestination = "signin") {
-                    composable ("signin") {
+                NavHost(navController, startDestination = NavRoute.SIGN_IN.name) {
+                    composable (NavRoute.SIGN_IN.name) {
                         SignInScreen(navController)
                     }
-                    composable ("signup") {
+                    composable (NavRoute.SIGN_UP.name) {
                         SignUpScreen(navController)
                     }
-                    composable("home") {
+                    composable(NavRoute.HOME.name) {
                         HomeScreen(
                             executorHs = cameraExecutor,
                             popBackStack = {
@@ -95,7 +89,7 @@ class MainActivity : FragmentActivity() {
                             }
                         )
                     }
-                    composable("camera") {
+                    composable(NavRoute.CAMERA.name) {
                         CameraScreen(
                             executorHs = cameraExecutor,
                             popBackStack = {
@@ -111,7 +105,7 @@ class MainActivity : FragmentActivity() {
                         val barcode = arguments.getString("barcode")
                         ProductInfo(barcode as String)
                     }
-                    composable("addressList") {
+                    composable(NavRoute.ADDRESS_LIST.name) {
                         AddressList(
                             onStockInfoClick = { barcode ->
                                 navController.navigate("stockInfoList/barcode=$barcode/byBarcode=false")
@@ -122,7 +116,7 @@ class MainActivity : FragmentActivity() {
                             drawerState, scope, addressListVM, navController
                         )
                     }
-                    composable("stockList") {
+                    composable(NavRoute.STOCK_LIST.name) {
                         StockList(
                             onStockInfoClick = { barcode ->
                                 navController.navigate("stockInfoList/barcode=$barcode/byBarcode=true")
@@ -133,7 +127,7 @@ class MainActivity : FragmentActivity() {
                             drawerState, scope, productListVM, navController
                         )
                     }
-                    composable("addStock") {
+                    composable(NavRoute.ADD_STOCK.name) {
                         AddStock(
                             navigateBack = {
                                 navController.popBackStack()
@@ -144,7 +138,7 @@ class MainActivity : FragmentActivity() {
                             navController
                         )
                     }
-                    composable("addBarcodeInfo") {
+                    composable(NavRoute.ADD_BARCODE_INFO.name) {
                         AddBarcodeInfo(
                             navigateBack = {
                                 navController.popBackStack()
@@ -170,7 +164,7 @@ class MainActivity : FragmentActivity() {
                                 navController.popBackStack()
                             })
                     }
-                    composable("StartStocktaking") {
+                    composable(NavRoute.START_STOCKTAKING.name) {
                         StartStocktaking(
                             navigateBack = {
                                 navController.popBackStack()

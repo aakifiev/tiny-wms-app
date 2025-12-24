@@ -1,6 +1,7 @@
 package ru.hqr.tinywms.ui.signin
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -25,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,23 +37,25 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import ru.hqr.tinywms.biometric.BiometricHelper
 import ru.hqr.tinywms.biometric.BiometricPreferences
+import ru.hqr.tinywms.conf.EmployeeWmsRest
 import ru.hqr.tinywms.cripto.CryptoManager
+import ru.hqr.tinywms.type.NavRoute
 import ru.hqr.tinywms.ui.component.CustomOutlinedTextField
-import ru.hqr.tinywms.ui.signup.SignUpScreenViewModel
+import ru.hqr.tinywms.ui.component.EnableBiometricDialog
 import ru.hqr.tinywms.util.ENCRYPTED_FILE_NAME
-import ru.hqr.tinywms.util.NavigationRoutes
 import ru.hqr.tinywms.util.PREF_BIOMETRIC
 
 @Composable
 fun SignInScreen(navController: NavHostController) {
 
     val context = LocalContext.current as FragmentActivity
-//    val viewModel = SignInScreenViewModel(BiometricPreferences(context))
     val viewModel = remember { SignInScreenViewModel(BiometricPreferences(context)) }
     val emailId by viewModel.emailId.collectAsState()
     val password by viewModel.password.collectAsState()
@@ -66,9 +70,11 @@ fun SignInScreen(navController: NavHostController) {
     val showBiometricPrompt by viewModel.showBiometricPrompt.collectAsState()
     val showBiometricIcon = remember { mutableStateOf(false) }
 
+    var showBiometricEnableDialog by remember { mutableStateOf(false) }
+
     LaunchedEffect(key1 = state) {
-        if (state is SignInState.Success) {
-            navController.navigate("stockList")
+        if (state is SignInState.Success && !showBiometricEnableDialog) {
+            navController.navigate(NavRoute.STOCK_LIST.name)
         }
     }
 
@@ -86,8 +92,22 @@ fun SignInScreen(navController: NavHostController) {
                     rememberCoroutineScope.launch {
                         val password1 = viewModel.preferences.getPassword()
                         val email1 = viewModel.preferences.getUserName()
+                        EmployeeWmsRest.retrofitService
+                            .findEmployee(email1!!, password1!!)
+                            .enqueue(object : Callback<Int?> {
+                                override fun onResponse(p0: Call<Int?>, p1: Response<Int?>) {
+                                    p1.body()?.let {
+                                        navController.navigate(NavRoute.STOCK_LIST.name)
+                                    }
+                                }
+
+                                override fun onFailure(p0: Call<Int?>, p1: Throwable) {
+                                    Log.i("", "login failure")
+                                }
+                            })
+                        navController.navigate(NavRoute.STOCK_LIST.name)
                     }
-                    navController.navigate("stockList")
+
                 })
         } else {
             val cryptoManager = CryptoManager()
@@ -100,6 +120,25 @@ fun SignInScreen(navController: NavHostController) {
             encryptedData?.let {
                 showBiometricIcon.value = true
             }
+        }
+    }
+
+    if (showBiometricEnableDialog) {
+        if (isBiometricAvailable) {
+            EnableBiometricDialog(
+                onEnable = {
+                    BiometricHelper.registerUserBiometrics(context) {
+                        showBiometricEnableDialog = false
+                        viewModel.setBiometricEnabled(true)
+                        navController.navigate(NavRoute.STOCK_LIST.name)
+                    }
+                },
+                {
+                    navController.navigate(NavRoute.STOCK_LIST.name)
+                }
+            )
+        } else {
+            navController.navigate(NavRoute.STOCK_LIST.name)
         }
     }
 
@@ -131,7 +170,7 @@ fun SignInScreen(navController: NavHostController) {
             onTrailingIconClicked = {
                 BiometricHelper.authenticateUser(context) { plainText ->
                     viewModel.setToken(plainText)
-                    navController.navigate("stockList")
+                    navController.navigate(NavRoute.STOCK_LIST.name)
                 }
             }
         )
@@ -161,7 +200,9 @@ fun SignInScreen(navController: NavHostController) {
                 .fillMaxWidth()
                 .padding(start = 32.dp, end = 32.dp),
             onClick = {
-                viewModel.onLoginClicked()
+
+                viewModel.onLoginClicked(context)
+                showBiometricEnableDialog = true
             },
             colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
             shape = RoundedCornerShape(16.dp)
@@ -189,7 +230,7 @@ fun SignInScreen(navController: NavHostController) {
         }
 
         Spacer(modifier = Modifier.padding(10.dp))
-        TextButton(onClick = { navController.navigate(NavigationRoutes.SIGN_UP) }) {
+        TextButton(onClick = { navController.navigate(NavRoute.SIGN_UP.name) }) {
             Text(
                 text = "Create account",
                 letterSpacing = 1.sp,

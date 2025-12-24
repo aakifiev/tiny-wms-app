@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import ru.hqr.tinywms.type.NavRoute
 
 @Composable
 fun CustomModalNavigationDrawer(
@@ -52,7 +53,7 @@ fun CustomModalNavigationDrawer(
                     label = { Text(text = "Список адресов", color = Color.Black) },
                     selected = false,
                     onClick = {
-                        navController.navigate("addressList")
+                        navController.navigate(NavRoute.ADDRESS_LIST.name)
                         scope.launch { drawerState.close() }
                     }
                 )
@@ -60,7 +61,7 @@ fun CustomModalNavigationDrawer(
                     label = { Text(text = "Добавить товар", color = Color.Black) },
                     selected = false,
                     onClick = {
-                        navController.navigate("addStock")
+                        navController.navigate(NavRoute.ADD_STOCK.name)
                         scope.launch { drawerState.close() }
                     }
                 )
@@ -68,7 +69,7 @@ fun CustomModalNavigationDrawer(
                     label = { Text(text = "Добавить информацию о товаре", color = Color.Black) },
                     selected = false,
                     onClick = {
-                        navController.navigate("addBarcodeInfo")
+                        navController.navigate(NavRoute.ADD_BARCODE_INFO.name)
                         scope.launch { drawerState.close() }
                     }
                 )
@@ -76,7 +77,7 @@ fun CustomModalNavigationDrawer(
                     label = { Text(text = "Инвентаризация", color = Color.Black) },
                     selected = false,
                     onClick = {
-                        navController.navigate("startStocktaking")
+                        navController.navigate(NavRoute.START_STOCKTAKING.name)
                         scope.launch { drawerState.close() }
                     }
                 )

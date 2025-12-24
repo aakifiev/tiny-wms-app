@@ -1,13 +1,20 @@
 package ru.hqr.tinywms.ui.signin
 
 
+import android.content.Context
+import android.util.Log
+import androidx.core.content.edit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import ru.hqr.tinywms.biometric.BiometricPreferences
+import ru.hqr.tinywms.conf.EmployeeWmsRest
 
 class SignInScreenViewModel(
     val preferences: BiometricPreferences
@@ -26,27 +33,58 @@ class SignInScreenViewModel(
         this.password.value = password
     }
 
-    fun onLoginClicked() = viewModelScope.launch {
-        if (!validateEmailId()) {
-            state.tryEmit(SignInState.InvalidEmailId)
-        } else if (!validatePassword()) {
-            state.tryEmit(SignInState.InvalidPassword)
-        } else {
-            validateUserCredentials()
+    fun setBiometricEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                preferences.setBiometricEnabled(enabled)
+            }
         }
     }
 
-    private fun validateUserCredentials() {
+    fun onLoginClicked(context: Context) = viewModelScope.launch {
+//        if (!validateEmailId()) {
+//            state.tryEmit(SignInState.InvalidEmailId)
+//        } else if (!validatePassword()) {
+//            state.tryEmit(SignInState.InvalidPassword)
+//        } else {
+        validateUserCredentials(context)
+//        }
+    }
+
+    private fun validateUserCredentials(context: Context) {
         viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                val username = preferences.getUserName()
-                val password = preferences.getPassword()
-                if (emailId.value != username || this@SignInScreenViewModel.password.value != password) {
-                    state.tryEmit(SignInState.InvalidCredentials)
-                } else {
-                    state.tryEmit(SignInState.Success)
-                }
-            }
+//            withContext(Dispatchers.IO) {
+            val sharedPreferences =
+                context.getSharedPreferences("TinyPrefs", Context.MODE_PRIVATE)
+            EmployeeWmsRest.retrofitService
+                .findEmployee(emailId.value, password.value)
+                .enqueue(object : Callback<Int?> {
+                    override fun onResponse(p0: Call<Int?>, p1: Response<Int?>) {
+                        p1.body()?.let {
+                            sharedPreferences.edit {
+                                putInt("clientId", it)
+                            }
+                            state.tryEmit(SignInState.Success)
+                            viewModelScope.launch {
+                                preferences.setUserName(emailId.value)
+                                preferences.setPassword(password.value)
+                            }
+                        }
+                    }
+
+                    override fun onFailure(p0: Call<Int?>, p1: Throwable) {
+                        state.tryEmit(SignInState.InvalidCredentials)
+                        Log.i("", "login failure")
+                    }
+                })
+//                val username = preferences.getUserName()
+//                val password = preferences.getPassword()
+//                if (emailId.value != username || this@SignInScreenViewModel.password.value != password) {
+//                    state.tryEmit(SignInState.InvalidCredentials)
+//                } else {
+//                    state.tryEmit(SignInState.Success)
+//                }
+//            }
         }
     }
 

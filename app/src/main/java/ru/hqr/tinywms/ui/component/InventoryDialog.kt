@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -54,13 +55,14 @@ fun InventoryDialog(
     ) {
         Card(
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .fillMaxHeight(),
             shape = RoundedCornerShape(16.dp)
         ) {
 //            Spacer(modifier = Modifier.height(40.dp))
             Box(
                 modifier = Modifier
-                    .fillMaxWidth(fraction = 0.9f)
+                    .fillMaxWidth()
                     .height(360.dp)
                     .clip(shape = RoundedCornerShape(6.dp))
             ) {
@@ -109,15 +111,6 @@ fun InventoryDialog(
             ) {
                 Text(buttonScanText.value)
             }
-            LazyColumn(
-                modifier = Modifier.fillMaxWidth(),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                filteredItems.forEach { elem ->
-                    item { MessageInventoryRow(elem.key.title, elem.value) }
-                }
-            }
             Button(
                 onClick = {
                     filteredItemsResult.putAll(filteredItems)
@@ -129,6 +122,16 @@ fun InventoryDialog(
             ) {
                 Text("Готово")
             }
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth(),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                filteredItems.forEach { elem ->
+                    item { MessageInventoryRow(elem.key.title, elem.value) }
+                }
+            }
+
         }
     }
 }

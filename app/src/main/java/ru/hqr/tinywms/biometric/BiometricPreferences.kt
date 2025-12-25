@@ -1,16 +1,11 @@
 package ru.hqr.tinywms.biometric
 
 import android.content.Context
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.first
 import ru.hqr.tinywms.conf.dataStore
-import ru.hqr.tinywms.util.PREF_BIOMETRIC
-import javax.inject.Inject
-import javax.inject.Named
 
 class BiometricPreferences(
     private val context: Context
@@ -25,50 +20,53 @@ class BiometricPreferences(
     suspend fun setToken(token: String) {
         context.dataStore.edit { preferences ->
             preferences[PreferencesKey.KEY_TOKEN] = token }
-//        preferencesDataStore.edit { preferences ->
-//            preferences[PreferencesKey.KEY_TOKEN] = token
-//        }
     }
 
     suspend fun getUserName(): String? {
         return context.dataStore.data.first()[PreferencesKey.KEY_USERNAME]
-//        return preferencesDataStore.data.first()[PreferencesKey.KEY_USERNAME]
     }
 
     suspend fun setUserName(userName: String) {
         context.dataStore.edit { preferences ->
             preferences[PreferencesKey.KEY_USERNAME] = userName
         }
-//        preferencesDataStore.edit { preferences ->
-//            preferences[PreferencesKey.KEY_USERNAME] = userName
-//        }
+    }
+
+    suspend fun resetUserName() {
+        context.dataStore.edit { preferences ->
+            preferences.remove(PreferencesKey.KEY_USERNAME)
+        }
     }
 
     suspend fun getPassword(): String? {
         return context.dataStore.data.first()[PreferencesKey.KEY_PASSWORD]
-//        return preferencesDataStore.data.first()[PreferencesKey.KEY_PASSWORD]
     }
 
     suspend fun setPassword(password: String) {
         context.dataStore.edit { preferences ->
             preferences[PreferencesKey.KEY_PASSWORD] = password
         }
-//        preferencesDataStore.edit { preferences ->
-//            preferences[PreferencesKey.KEY_PASSWORD] = password
-//        }
+    }
+
+    suspend fun resetPassword() {
+        context.dataStore.edit { preferences ->
+            preferences.remove(PreferencesKey.KEY_PASSWORD)
+        }
     }
 
     suspend fun isBiometricEnabled(): Boolean {
         return context.dataStore.data.first()[PreferencesKey.KEY_BIOMETRIC_ENABLED] ?: false
-//        return preferencesDataStore.data.first()[PreferencesKey.KEY_BIOMETRIC_ENABLED] ?: false
     }
 
     suspend fun setBiometricEnabled(isEnabled: Boolean) {
         context.dataStore.edit { preferences ->
             preferences[PreferencesKey.KEY_BIOMETRIC_ENABLED] = isEnabled
         }
-//        preferencesDataStore.edit { preferences ->
-//            preferences[PreferencesKey.KEY_BIOMETRIC_ENABLED] = isEnabled
-//        }
+    }
+
+    suspend fun resetBiometricEnabled() {
+        context.dataStore.edit { preferences ->
+            preferences.remove(PreferencesKey.KEY_BIOMETRIC_ENABLED)
+        }
     }
 }

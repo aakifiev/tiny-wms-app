@@ -51,6 +51,14 @@ class SignInScreenViewModel(
 //        }
     }
 
+    fun onSignOutClicked(context: Context) = viewModelScope.launch {
+        preferences.resetUserName()
+        preferences.resetPassword()
+        preferences.setBiometricEnabled(false)
+        showBiometricPrompt.tryEmit(false)
+//        setBiometricEnabled(false)
+    }
+
     private fun validateUserCredentials(context: Context) {
         viewModelScope.launch {
 //            withContext(Dispatchers.IO) {

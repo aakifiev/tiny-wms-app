@@ -200,7 +200,6 @@ fun SignInScreen(navController: NavHostController) {
                 .fillMaxWidth()
                 .padding(start = 32.dp, end = 32.dp),
             onClick = {
-
                 viewModel.onLoginClicked(context)
                 showBiometricEnableDialog = true
             },

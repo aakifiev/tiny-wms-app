@@ -8,13 +8,18 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.fragment.app.FragmentActivity
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import ru.hqr.tinywms.biometric.BiometricPreferences
 import ru.hqr.tinywms.type.NavRoute
+import ru.hqr.tinywms.ui.signin.SignInScreenViewModel
 
 @Composable
 fun CustomModalNavigationDrawer(
@@ -22,6 +27,7 @@ fun CustomModalNavigationDrawer(
     navController: NavHostController,
     content: @Composable () -> Unit
 ) {
+    val context = LocalContext.current as FragmentActivity
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
@@ -45,7 +51,7 @@ fun CustomModalNavigationDrawer(
                     label = { Text(text = "Список товаров", color = Color.Black) },
                     selected = false,
                     onClick = {
-                        navController.navigate("stockList")
+                        navController.navigate(NavRoute.STOCK_LIST.name)
                         scope.launch { drawerState.close() }
                     }
                 )
@@ -79,6 +85,20 @@ fun CustomModalNavigationDrawer(
                     onClick = {
                         navController.navigate(NavRoute.START_STOCKTAKING.name)
                         scope.launch { drawerState.close() }
+                    }
+                )
+                NavigationDrawerItem(
+                    label = { Text(text = "Выход", color = Color.Black) },
+                    selected = false,
+                    onClick = {
+                        val biometricPreferences = BiometricPreferences(context)
+                        scope.launch {
+                            biometricPreferences.resetPassword()
+                            biometricPreferences.resetUserName()
+                            biometricPreferences.setBiometricEnabled(false)
+                            drawerState.close()
+                            navController.navigate(NavRoute.SIGN_IN.name)
+                        }
                     }
                 )
             }

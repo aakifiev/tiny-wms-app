@@ -130,7 +130,7 @@ fun SignUpScreen(navController: NavHostController) {
                 .fillMaxWidth()
                 .padding(start = 32.dp, end = 32.dp),
             onClick = {
-                viewModel.onSignUpClicked()
+                viewModel.onSignUpClicked(context)
             },
             colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
             shape = RoundedCornerShape(16.dp)

@@ -62,9 +62,9 @@ object BiometricHelper {
 
     private fun getPromptInfo(): BiometricPrompt.PromptInfo {
         return BiometricPrompt.PromptInfo.Builder()
-            .setTitle("Вход по отпечатку пальца")
-            .setSubtitle("Войдите используя отпечаток пальца")
-            .setDescription("Приложите отпечаток пальца для входа")
+            .setTitle("Вход в TinyWms")
+//            .setSubtitle("Войдите используя отпечаток пальца")
+//            .setDescription("Приложите отпечаток пальца для входа")
             .setConfirmationRequired(false)
             .setNegativeButtonText("Отменить")
             .build()

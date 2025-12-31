@@ -17,6 +17,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -34,6 +35,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.FragmentActivity
@@ -142,99 +144,101 @@ fun SignInScreen(navController: NavHostController) {
         }
     }
 
-    Column(
-        modifier = Modifier
-            .padding(16.dp)
-            .fillMaxWidth()
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = "titleText",
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth(),
-            style = MaterialTheme.typography.headlineSmall,
-            color = MaterialTheme.colorScheme.primary,
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        CustomOutlinedTextField(
-            label = "email",
-            text = emailId,
-            isPassword = false,
-            isError = isEmailError,
-            showTrailingIcon = showBiometricIcon.value,
-            onValueChange = {
-                viewModel.onEmailIdChanged(it)
-            },
-            onTrailingIconClicked = {
-                BiometricHelper.authenticateUser(context) { plainText ->
-                    viewModel.setToken(plainText)
-                    navController.navigate(NavRoute.STOCK_LIST.name)
+    Scaffold { padding ->
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "Вход в TinyWms",
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth(),
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.primary,
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            CustomOutlinedTextField(
+                label = "email",
+                text = emailId,
+                isPassword = false,
+                isError = isEmailError,
+                showTrailingIcon = showBiometricIcon.value,
+                onValueChange = {
+                    viewModel.onEmailIdChanged(it)
+                },
+                onTrailingIconClicked = {
+                    BiometricHelper.authenticateUser(context) { plainText ->
+                        viewModel.setToken(plainText)
+                        navController.navigate(NavRoute.STOCK_LIST.name)
+                    }
+                }
+            )
+
+            Spacer(modifier = Modifier.padding(3.dp))
+            CustomOutlinedTextField(
+                label = "password",
+                text = password,
+                isPassword = true,
+                isError = isPasswordError
+            ) {
+                viewModel.onPasswordChanged(it)
+            }
+
+            Spacer(modifier = Modifier.padding(10.dp))
+
+            AnimatedVisibility(visible = state is SignInState.InvalidCredentials) {
+                Text(
+                    text = "email or password",
+                    fontSize = 14.sp,
+                    color = Color.Red
+                )
+            }
+
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 32.dp, end = 32.dp),
+                onClick = {
+                    viewModel.onLoginClicked(context)
+                    showBiometricEnableDialog = true
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Box(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .background(
+                                brush =
+                                    Brush.horizontalGradient(
+                                        colors = listOf(
+                                            Color(0xFF484BF1),
+                                            Color(0xFFB4A0F5)
+                                        )
+                                    ),
+                                shape = RoundedCornerShape(topStart = 30.dp, bottomEnd = 30.dp)
+                            )
+                            .clip(RoundedCornerShape(topStart = 30.dp, bottomEnd = 30.dp))
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(text = "Авторизация", fontSize = 20.sp, color = Color.White)
                 }
             }
-        )
 
-        Spacer(modifier = Modifier.padding(3.dp))
-        CustomOutlinedTextField(
-            label = "password",
-            text = password,
-            isPassword = true,
-            isError = isPasswordError
-        ) {
-            viewModel.onPasswordChanged(it)
-        }
-
-        Spacer(modifier = Modifier.padding(10.dp))
-
-        AnimatedVisibility(visible = state is SignInState.InvalidCredentials) {
-            Text(
-                text = "email or password",
-                fontSize = 14.sp,
-                color = Color.Red
-            )
-        }
-
-        Button(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 32.dp, end = 32.dp),
-            onClick = {
-                viewModel.onLoginClicked(context)
-                showBiometricEnableDialog = true
-            },
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-            shape = RoundedCornerShape(16.dp)
-        ) {
-            Box(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .background(
-                            brush =
-                                Brush.horizontalGradient(
-                                    colors = listOf(
-                                        Color(0xFF484BF1),
-                                        Color(0xFFB4A0F5)
-                                    )
-                                ),
-                            shape = RoundedCornerShape(topStart = 30.dp, bottomEnd = 30.dp)
-                        )
-                        .clip(RoundedCornerShape(topStart = 30.dp, bottomEnd = 30.dp))
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(text = "Login", fontSize = 20.sp, color = Color.White)
+            Spacer(modifier = Modifier.padding(10.dp))
+            TextButton(onClick = { navController.navigate(NavRoute.SIGN_UP.name) }) {
+                Text(
+                    text = "Создать новый аккаунт",
+                    letterSpacing = 1.sp,
+                    style = MaterialTheme.typography.labelLarge
+                )
             }
-        }
-
-        Spacer(modifier = Modifier.padding(10.dp))
-        TextButton(onClick = { navController.navigate(NavRoute.SIGN_UP.name) }) {
-            Text(
-                text = "Create account",
-                letterSpacing = 1.sp,
-                style = MaterialTheme.typography.labelLarge
-            )
         }
     }
 }

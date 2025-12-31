@@ -14,7 +14,14 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.outlined.Done
+import androidx.compose.material.icons.outlined.KeyboardArrowDown
+import androidx.compose.material.icons.outlined.KeyboardArrowUp
+import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DropdownMenu
@@ -47,6 +54,7 @@ import ru.hqr.tinywms.dto.client.StockListInfo
 import ru.hqr.tinywms.ui.component.ActualizeDialog
 import ru.hqr.tinywms.ui.component.CustomModalNavigationDrawer
 import ru.hqr.tinywms.view.StockInfoListViewModel
+import java.math.BigDecimal
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -174,6 +182,9 @@ fun MessageRow(
     val expanded = remember {
         mutableStateOf(false)
     }
+    val newQuantity = remember {
+        mutableStateOf(message.quantity)
+    }
     DropdownMenu(
         modifier = Modifier.padding(8.dp),
         expanded = expanded.value,
@@ -228,7 +239,40 @@ fun MessageRow(
     ) {
         Text("Адрес: ${message.addressId}")
         Text("Наименование: ${message.title}")
-        Text("Количество: ${message.quantity}")
+        Row {
+            Text("Количество:")
+            IconButton(onClick = {
+                if (BigDecimal.ZERO != newQuantity.value) {
+                    newQuantity.value = newQuantity.value.minus(BigDecimal.ONE)
+                }
+            }) {
+                Icon(
+                    imageVector = Icons.Filled.KeyboardArrowDown,
+                    contentDescription = "Clear Icon",
+                    tint = Color.Gray
+                )
+            }
+            Text("${newQuantity.value}")
+            IconButton(onClick = {
+                newQuantity.value = newQuantity.value.plus(BigDecimal.ONE)
+            }) {
+                Icon(
+                    imageVector = Icons.Filled.KeyboardArrowUp,
+                    contentDescription = "Clear Icon",
+                    tint = Color.Gray
+                )
+            }
+            IconButton(onClick = {
+
+            }) {
+                Icon(
+                    imageVector = Icons.Outlined.Done,
+                    contentDescription = "Clear Icon",
+                    tint = Color.Gray
+                )
+            }
+        }
+
         HorizontalDivider()
     }
 }

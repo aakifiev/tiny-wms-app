@@ -40,6 +40,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -47,9 +48,16 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import ru.hqr.tinywms.conf.TinyWmsRest
+import ru.hqr.tinywms.dto.client.StockInfoRequest
 import ru.hqr.tinywms.dto.client.StockListInfo
 import ru.hqr.tinywms.ui.component.ActualizeDialog
 import ru.hqr.tinywms.ui.component.CustomModalNavigationDrawer
@@ -162,7 +170,7 @@ fun StockInfoList(
                         .verticalScroll(rememberScrollState())
                 ) {
                     vm.stockInfoList.forEach { stockInfo ->
-                        MessageRow(stockInfo, showDialog, addressId, barcodeForActualize)
+                        MessageRow(context,stockInfo, showDialog, addressId, barcodeForActualize)
                     }
                 }
             }
@@ -173,6 +181,7 @@ fun StockInfoList(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MessageRow(
+    context: Context,
     message: StockListInfo,
     showDialog: MutableState<Boolean>,
     addressId: MutableState<String>,
@@ -185,6 +194,7 @@ fun MessageRow(
     val newQuantity = remember {
         mutableStateOf(message.quantity)
     }
+    val rememberCoroutineScope = rememberCoroutineScope()
     DropdownMenu(
         modifier = Modifier.padding(8.dp),
         expanded = expanded.value,
@@ -263,7 +273,34 @@ fun MessageRow(
                 )
             }
             IconButton(onClick = {
+                val clientId =
+                    context.getSharedPreferences("TinyPrefs", Context.MODE_PRIVATE)
+                        .getInt("clientId", 0)
 
+                val stockInfo = StockInfoRequest(
+                    barcode = message.barcode,
+                    quantity = newQuantity.value,
+                    measureUnit = "шт.")
+                rememberCoroutineScope.launch {
+                    TinyWmsRest.retrofitService.actualizeStockInfo(
+                        clientId,
+                        message.addressId, listOf(stockInfo)
+                    ).enqueue(object : Callback<Unit> {
+                        override fun onResponse(
+                            p0: Call<Unit>,
+                            p1: Response<Unit>
+                        ) {
+                            Log.i("onResponse", p1.toString())
+//                                        clientId.intValue = getClientId(sharedPreferences)
+//                                        response.value = p1.body()!!
+                        }
+
+                        override fun onFailure(p0: Call<Unit>, p1: Throwable) {
+                            Log.i("onFailure", "onFailure")
+                        }
+
+                    })
+                }
             }) {
                 Icon(
                     imageVector = Icons.Outlined.Done,

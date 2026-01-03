@@ -35,7 +35,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.FragmentActivity
@@ -88,7 +87,8 @@ fun SignInScreen(navController: NavHostController) {
 
     LaunchedEffect(key1 = showBiometricPrompt) {
         if (showBiometricPrompt) {
-            BiometricHelper.authenticateUser(context,
+            BiometricHelper.authenticateUser(
+                context,
                 onSuccess = { plainText ->
                     viewModel.setToken(plainText)
                     rememberCoroutineScope.launch {
@@ -107,9 +107,8 @@ fun SignInScreen(navController: NavHostController) {
                                     Log.i("", "login failure")
                                 }
                             })
-                        navController.navigate(NavRoute.STOCK_LIST.name)
+//                        navController.navigate(NavRoute.STOCK_LIST.name)
                     }
-
                 })
         } else {
             val cryptoManager = CryptoManager()
@@ -203,8 +202,15 @@ fun SignInScreen(navController: NavHostController) {
                     .fillMaxWidth()
                     .padding(start = 32.dp, end = 32.dp),
                 onClick = {
-                    viewModel.onLoginClicked(context)
-                    showBiometricEnableDialog = true
+                    rememberCoroutineScope.launch {
+                        viewModel.setBiometricEnabled(false)
+                        viewModel.onLoginClicked2(context)
+                        viewModel.state.value.let {
+                            if (SignInState.Success == it) {
+                                showBiometricEnableDialog = true
+                            }
+                        }
+                    }
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
                 shape = RoundedCornerShape(16.dp)

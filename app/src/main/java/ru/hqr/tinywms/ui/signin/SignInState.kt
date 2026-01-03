@@ -51,6 +51,10 @@ class SignInScreenViewModel(
 //        }
     }
 
+    suspend fun onLoginClicked2(context: Context) {
+        validateUserCredentials2(context)
+    }
+
     fun onSignOutClicked(context: Context) = viewModelScope.launch {
         preferences.resetUserName()
         preferences.resetPassword()
@@ -93,6 +97,58 @@ class SignInScreenViewModel(
 //                    state.tryEmit(SignInState.Success)
 //                }
 //            }
+        }
+    }
+
+    private suspend fun validateUserCredentials2(context: Context) {
+        withContext(Dispatchers.IO) {
+            val sharedPreferences =
+                context.getSharedPreferences("TinyPrefs", Context.MODE_PRIVATE)
+            val execute = EmployeeWmsRest.retrofitService
+                .findEmployee(emailId.value, password.value)
+                .execute()
+            if (execute.isSuccessful) {
+                execute.body()?.let {
+                    sharedPreferences.edit {
+                        putInt("clientId", it)
+                    }
+                    state.tryEmit(SignInState.Success)
+                    viewModelScope.launch {
+                        preferences.setUserName(emailId.value)
+                        preferences.setPassword(password.value)
+                    }
+                }
+            } else {
+                state.tryEmit(SignInState.InvalidCredentials)
+                Log.i("", "login failure")
+            }
+
+//                .enqueue(object : Callback<Int?> {
+//                    override fun onResponse(p0: Call<Int?>, p1: Response<Int?>) {
+//                        p1.body()?.let {
+//                            sharedPreferences.edit {
+//                                putInt("clientId", it)
+//                            }
+//                            state.tryEmit(SignInState.Success)
+//                            viewModelScope.launch {
+//                                preferences.setUserName(emailId.value)
+//                                preferences.setPassword(password.value)
+//                            }
+//                        }
+//                    }
+//
+//                    override fun onFailure(p0: Call<Int?>, p1: Throwable) {
+//                        state.tryEmit(SignInState.InvalidCredentials)
+//                        Log.i("", "login failure")
+//                    }
+//                })
+//                val username = preferences.getUserName()
+//                val password = preferences.getPassword()
+//                if (emailId.value != username || this@SignInScreenViewModel.password.value != password) {
+//                    state.tryEmit(SignInState.InvalidCredentials)
+//                } else {
+//                    state.tryEmit(SignInState.Success)
+//                }
         }
     }
 

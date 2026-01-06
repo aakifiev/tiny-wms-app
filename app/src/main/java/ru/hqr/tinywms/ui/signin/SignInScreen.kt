@@ -107,7 +107,6 @@ fun SignInScreen(navController: NavHostController) {
                                     Log.i("", "login failure")
                                 }
                             })
-//                        navController.navigate(NavRoute.STOCK_LIST.name)
                     }
                 })
         } else {
@@ -206,7 +205,7 @@ fun SignInScreen(navController: NavHostController) {
                         viewModel.setBiometricEnabled(false)
                         viewModel.onLoginClicked2(context)
                         viewModel.state.value.let {
-                            if (SignInState.Success == it) {
+                            if (SignInState.Success == it && isBiometricAvailable) {
                                 showBiometricEnableDialog = true
                             }
                         }

@@ -274,7 +274,7 @@ fun AddStock(
                             val stockInfo = StockInfoRequest(
                                 barcodeSearchQuery.value,
                                 quantity.value.toBigDecimal(),
-                                "UNIT"
+                                "шт."
                             )
                             rememberCoroutineScope.launch {
                                 TinyWmsRest.retrofitService.addStockInfo(

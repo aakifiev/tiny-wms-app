@@ -92,7 +92,7 @@ fun ActualizeDialog(
                             val stockInfo = StockInfoRequest(
                                 barcode = barcode.value,
                                 quantity = quantity.value.toBigDecimal(),
-                                measureUnit = "UNIT")
+                                measureUnit = "шт.")
                             rememberCoroutineScope.launch {
                                 TinyWmsRest.retrofitService.actualizeStockInfo(
                                     clientId,

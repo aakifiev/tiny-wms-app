@@ -205,11 +205,11 @@ fun StartStocktaking(
                             StockInfoRequest(
                                 it.key.barcode,
                                 BigDecimal(it.value.toInt()),
-                                "UNIT"
+                                "шт."
                             )
                         }
                         rememberCoroutineScope.launch {
-                            TinyWmsRest.retrofitService.addStockInfo(
+                            TinyWmsRest.retrofitService.actualizeStockInfo(
                                 clientId,
                                 searchQuery,
                                 stockInfoListRequest

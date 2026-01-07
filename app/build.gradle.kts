@@ -86,6 +86,7 @@ dependencies {
 // DataStore
     implementation("androidx.datastore:datastore-preferences:1.2.0")
     implementation("androidx.datastore:datastore-preferences-core:1.2.0")
+    implementation(libs.play.services.wallet)
 //    runtimeOnly("com.google.mlkit:barcode-scanning:17.3.0")
 
     testImplementation(libs.junit)

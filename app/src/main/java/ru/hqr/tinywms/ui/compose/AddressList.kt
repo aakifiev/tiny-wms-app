@@ -36,7 +36,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import ru.hqr.tinywms.ui.component.BottomNavigationBar
 import ru.hqr.tinywms.ui.component.CustomModalNavigationDrawer
 import ru.hqr.tinywms.ui.component.FilterableAddressList
 import ru.hqr.tinywms.view.AddressListViewModel
@@ -64,10 +66,11 @@ fun AddressList(
     var isRefreshing by remember { mutableStateOf(false) }
 
     var searchQuery by remember { mutableStateOf("") }
-
+    val state = rememberPullToRefreshState()
     val onRefresh: () -> Unit = {
         isRefreshing = true
         scope.launch {
+            delay(1500)
             vm.getAddressList(clientId)
             isRefreshing = false
         }
@@ -115,6 +118,9 @@ fun AddressList(
                 ) {
                     Icon(Icons.Filled.Add, "Add address")
                 }
+            },
+            bottomBar = {
+                BottomNavigationBar()
             }
         ) { padding ->
             Column(
@@ -177,14 +183,12 @@ fun AddressList(
 //                    )
                 )
 
-                val state = rememberPullToRefreshState()
+
 
                 PullToRefreshBox(
                     state = state,
                     onRefresh = onRefresh,
-//                    onRefresh = { vm.getStockList(1) },
                     isRefreshing = isRefreshing,
-//                    modifier = Modifier.padding(padding),
 //                    indicator = {
 //                        PullToRefreshDefaults.LoadingIndicator(
 //                            state = state,

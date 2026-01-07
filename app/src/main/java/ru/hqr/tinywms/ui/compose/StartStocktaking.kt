@@ -46,6 +46,7 @@ import ru.hqr.tinywms.conf.TinyWmsRest
 import ru.hqr.tinywms.dto.client.Barcode
 import ru.hqr.tinywms.dto.client.StockInfoRequest
 import ru.hqr.tinywms.type.NavRoute
+import ru.hqr.tinywms.ui.component.BottomNavigationBar
 import ru.hqr.tinywms.ui.component.CustomModalNavigationDrawer
 import ru.hqr.tinywms.ui.component.InventoryDialog
 import ru.hqr.tinywms.ui.component.MessageInventoryRow
@@ -123,6 +124,9 @@ fun StartStocktaking(
                         }
                     }
                 )
+            },
+            bottomBar = {
+                BottomNavigationBar()
             }
         ) { padding ->
             Column(

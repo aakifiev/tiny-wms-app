@@ -60,6 +60,7 @@ import ru.hqr.tinywms.conf.TinyWmsRest
 import ru.hqr.tinywms.dto.client.StockInfoRequest
 import ru.hqr.tinywms.dto.client.StockListInfo
 import ru.hqr.tinywms.ui.component.ActualizeDialog
+import ru.hqr.tinywms.ui.component.BottomNavigationBar
 import ru.hqr.tinywms.ui.component.CustomModalNavigationDrawer
 import ru.hqr.tinywms.view.StockInfoListViewModel
 import java.math.BigDecimal
@@ -155,6 +156,9 @@ fun StockInfoList(
                         }
                     )
                 }
+            },
+            bottomBar = {
+                BottomNavigationBar()
             }
         ) { padding ->
             val state = rememberPullToRefreshState()

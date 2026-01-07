@@ -17,24 +17,29 @@ import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import ru.hqr.tinywms.ui.component.BottomNavigationBar
 import ru.hqr.tinywms.ui.component.CustomModalNavigationDrawer
 import ru.hqr.tinywms.ui.component.FilterableList
 import ru.hqr.tinywms.view.StockListViewModel
@@ -45,10 +50,11 @@ fun StockList(
     onStockInfoClick: (barcode: String) -> Unit,
     navigateBack: () -> Unit,
     drawerState: DrawerState,
-    scope: CoroutineScope,
     vm: StockListViewModel,
     navController: NavHostController
 ) {
+
+    val scope = rememberCoroutineScope()
 
     val context = LocalContext.current
     var clientId by remember { mutableStateOf(0) }
@@ -66,10 +72,13 @@ fun StockList(
     val onRefresh: () -> Unit = {
         isRefreshing = true
         scope.launch {
+            delay(500)
             vm.getStockList(clientId)
             isRefreshing = false
         }
     }
+
+    val state = rememberPullToRefreshState()
 
     CustomModalNavigationDrawer(
         drawerState = drawerState,
@@ -104,6 +113,9 @@ fun StockList(
                         }
                     }
                 )
+            },
+            bottomBar = {
+                BottomNavigationBar()
             }
         ) { padding ->
             Column(
@@ -160,26 +172,21 @@ fun StockList(
                     },
                     singleLine = true,
                     shape = RoundedCornerShape(12.dp),
-//                    colors = TextFieldDefaults.outlinedTextFieldColors(
-//                        focusedBorderColor = MaterialTheme.colorScheme.primary,
-//                        unfocusedBorderColor = Color.Gray
-//                    )
                 )
-
-                val state = rememberPullToRefreshState()
 
                 PullToRefreshBox(
                     state = state,
                     onRefresh = onRefresh,
                     isRefreshing = isRefreshing,
-//                    modifier = Modifier.padding(padding),
-//                    indicator = {
-//                        PullToRefreshDefaults.LoadingIndicator(
-//                            state = state,
-//                            isRefreshing = isRefreshing,
-//                            modifier = Modifier.align(Alignment.TopCenter),
-//                        )
-//                    },
+                    indicator = {
+                        Indicator(
+                            state = state,
+                            isRefreshing = false,
+                            modifier = Modifier.align(Alignment.TopCenter),
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        )
+                    },
                 ) {
                     FilterableList(
                         items = vm.stocks,

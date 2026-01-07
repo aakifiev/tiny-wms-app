@@ -122,13 +122,11 @@ class MainActivity : FragmentActivity() {
                                 navController.navigate("stockInfoList/barcode=$barcode/byBarcode=true")
                             },
                             navigateBack = {
-//                                val route1 = navController.currentDestination?.parent?.nodes
-//                                if (route1 == "SIGN_IN") {
-//                                    return@StockList
-//                                }
                                 navController.popBackStack()
                             },
-                            drawerState, scope, productListVM, navController
+                            drawerState,
+                            productListVM,
+                            navController
                         )
                     }
                     composable(NavRoute.ADD_STOCK.name) {

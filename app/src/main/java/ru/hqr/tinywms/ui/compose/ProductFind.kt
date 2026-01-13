@@ -17,7 +17,7 @@ import ru.hqr.tinywms.ui.component.Camera
 import java.util.concurrent.Executor
 
 @Composable
-fun HomeScreen(executorHs: Executor,
+fun ProductFind(executorHs: Executor,
                popBackStack: () -> Unit,
                toProductInfo: (barcode: String) -> Unit) {
 

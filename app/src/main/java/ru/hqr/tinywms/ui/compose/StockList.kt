@@ -26,6 +26,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import ru.hqr.tinywms.type.NavRoute
 import ru.hqr.tinywms.ui.component.BottomNavigationBar
 import ru.hqr.tinywms.ui.component.CustomModalNavigationDrawer
 import ru.hqr.tinywms.ui.component.FilterableList
@@ -51,7 +53,8 @@ fun StockList(
     navigateBack: () -> Unit,
     drawerState: DrawerState,
     vm: StockListViewModel,
-    navController: NavHostController
+    navController: NavHostController,
+    selectedDestination: MutableIntState
 ) {
 
     val scope = rememberCoroutineScope()
@@ -115,7 +118,7 @@ fun StockList(
                 )
             },
             bottomBar = {
-                BottomNavigationBar()
+                BottomNavigationBar(navController, selectedDestination)
             }
         ) { padding ->
             Column(
@@ -191,7 +194,8 @@ fun StockList(
                     FilterableList(
                         items = vm.stocks,
                         query = searchQuery,
-                        onStockInfoClick = onStockInfoClick
+//                        onStockInfoClick = onStockInfoClick
+                        onStockInfoClick = {barcode -> navController.navigate(NavRoute.STOCK_INFO.name)}
                     )
                 }
             }

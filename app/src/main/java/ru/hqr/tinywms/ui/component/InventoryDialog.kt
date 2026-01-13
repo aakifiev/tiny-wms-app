@@ -72,7 +72,7 @@ fun InventoryDialog(
                         Log.i("scanBarcode", "There was as error with the camera: $it")
                     },
                     onCatchBarcode = { barcode ->
-                        if (isScan.value) {
+//                        if (isScan.value) {
                             rememberCoroutineScope.launch {
                                 val result = TinyWmsRest.retrofitService.findBarcode(barcode)
                                 result!!.enqueue(object : Callback<Barcode?> {
@@ -82,8 +82,10 @@ fun InventoryDialog(
                                     ) {
                                         filteredItems.merge(p1.body()!!, 1)
                                         { oldVal, newVal -> (newVal + oldVal).toShort() }
-                                        isScan.value = false
+//                                        isScan.value = false
                                         buttonScanText.value = "Сканировать"
+                                        filteredItemsResult.putAll(filteredItems)
+                                        showDialog.value = false
                                     }
 
                                     override fun onFailure(p0: Call<Barcode?>, p1: Throwable) {
@@ -91,7 +93,7 @@ fun InventoryDialog(
                                     }
                                 })
                             }
-                        }
+//                        }
                     })
 
             }
@@ -148,6 +150,5 @@ fun MessageInventoryRow(
         verticalArrangement = Arrangement.Center
     ) {
         Text("Штрихкод: $barcode: $count шт.")
-        HorizontalDivider()
     }
 }

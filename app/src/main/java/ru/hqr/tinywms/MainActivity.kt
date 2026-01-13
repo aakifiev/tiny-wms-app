@@ -10,21 +10,26 @@ import androidx.camera.core.ExperimentalGetImage
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import ru.hqr.tinywms.type.NavRoute
+import ru.hqr.tinywms.ui.compose.Account
 import ru.hqr.tinywms.ui.compose.AddBarcodeInfo
 import ru.hqr.tinywms.ui.compose.AddStock
 import ru.hqr.tinywms.ui.compose.AddressList
 import ru.hqr.tinywms.ui.compose.CameraScreen
-import ru.hqr.tinywms.ui.compose.HomeScreen
+import ru.hqr.tinywms.ui.compose.Home
 import ru.hqr.tinywms.ui.compose.LoginPage
+import ru.hqr.tinywms.ui.compose.ProductFind
 import ru.hqr.tinywms.ui.compose.ProductInfo
 import ru.hqr.tinywms.ui.compose.StartStocktaking
+import ru.hqr.tinywms.ui.compose.StockInfo
 import ru.hqr.tinywms.ui.compose.StockInfoList
 import ru.hqr.tinywms.ui.compose.StockList
 import ru.hqr.tinywms.ui.signin.SignInScreen
@@ -69,17 +74,41 @@ class MainActivity : FragmentActivity() {
         setContent {
             val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
             val scope = rememberCoroutineScope()
+            val selectedDestination = remember { mutableIntStateOf(0) }
             TinyWmsTheme {
                 val navController = rememberNavController()
-                NavHost(navController, startDestination = NavRoute.SIGN_IN.name) {
-                    composable (NavRoute.SIGN_IN.name) {
+                NavHost(navController, startDestination = NavRoute.HOME.name) {
+                    composable(NavRoute.SIGN_IN.name) {
                         SignInScreen(navController)
                     }
-                    composable (NavRoute.SIGN_UP.name) {
+                    composable(NavRoute.SIGN_UP.name) {
                         SignUpScreen(navController)
                     }
                     composable(NavRoute.HOME.name) {
-                        HomeScreen(
+                        Home (navController, drawerState, selectedDestination)
+                    }
+                    composable(NavRoute.ACCOUNT.name) {
+                        Account(
+                            navigateBack = {
+                                navController.popBackStack()
+                            },
+                            drawerState = drawerState,
+                            navController = navController,
+                            selectedDestination = selectedDestination
+                        )
+                    }
+                    composable(NavRoute.STOCK_INFO.name) {
+                        StockInfo(
+                            navigateBack = {
+                                navController.popBackStack()
+                            },
+                            drawerState = drawerState,
+                            navController = navController,
+                            selectedDestination = selectedDestination
+                        )
+                    }
+                    composable(NavRoute.FIND_PRODUCT_INFO.name) {
+                        ProductFind(
                             executorHs = cameraExecutor,
                             popBackStack = {
                                 navController.popBackStack()
@@ -113,7 +142,8 @@ class MainActivity : FragmentActivity() {
                             navigateBack = {
                                 navController.popBackStack()
                             },
-                            drawerState, scope, addressListVM, navController
+                            drawerState, scope, addressListVM, navController,
+                            selectedDestination
                         )
                     }
                     composable(NavRoute.STOCK_LIST.name) {
@@ -126,7 +156,8 @@ class MainActivity : FragmentActivity() {
                             },
                             drawerState,
                             productListVM,
-                            navController
+                            navController,
+                            selectedDestination
                         )
                     }
                     composable(NavRoute.ADD_STOCK.name) {
@@ -157,7 +188,8 @@ class MainActivity : FragmentActivity() {
                         val byBarcode = arguments.getString("byBarcode").toBoolean()
                         StockInfoList(
                             barcode as String, byBarcode,
-                            drawerState, scope, stockInfoListVM, navController)
+                            drawerState, scope, stockInfoListVM, navController
+                        )
                     }
                     composable("loginPage") {
                         LoginPage(
@@ -172,7 +204,9 @@ class MainActivity : FragmentActivity() {
                                 navController.popBackStack()
                             },
                             drawerState, scope, addressListVM,
-                            cameraExecutor, navController)
+                            cameraExecutor, navController,
+                            selectedDestination
+                        )
                     }
                 }
             }

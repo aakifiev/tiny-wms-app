@@ -1,13 +1,17 @@
 package ru.hqr.tinywms.ui.signin
 
+import android.R
 import android.content.Context
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -15,7 +19,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -130,23 +137,25 @@ fun SignInScreen(navController: NavHostController) {
                     BiometricHelper.registerUserBiometrics(context) {
                         showBiometricEnableDialog = false
                         viewModel.setBiometricEnabled(true)
-                        navController.navigate(NavRoute.STOCK_LIST.name)
+                        navController.navigate(NavRoute.HOME.name)
                     }
                 },
                 {
-                    navController.navigate(NavRoute.STOCK_LIST.name)
+                    navController.navigate(NavRoute.HOME.name)
                 }
             )
         } else {
-            navController.navigate(NavRoute.STOCK_LIST.name)
+            navController.navigate(NavRoute.HOME.name)
         }
     }
 
     Scaffold { padding ->
         Column(
             modifier = Modifier
-                .padding(16.dp)
+//                .padding(16.dp)
+                .background(color = Color.Red)
                 .fillMaxWidth()
+                .fillMaxHeight()
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
@@ -156,11 +165,12 @@ fun SignInScreen(navController: NavHostController) {
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth(),
                 style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.primary,
+                color = Color.White,
+//                color = MaterialTheme.colorScheme.primary,
             )
             Spacer(modifier = Modifier.height(8.dp))
             CustomOutlinedTextField(
-                label = "email",
+                label = "E-mail",
                 text = emailId,
                 isPassword = false,
                 isError = isEmailError,
@@ -178,12 +188,37 @@ fun SignInScreen(navController: NavHostController) {
 
             Spacer(modifier = Modifier.padding(3.dp))
             CustomOutlinedTextField(
-                label = "password",
+                label = "Пароль",
                 text = password,
                 isPassword = true,
                 isError = isPasswordError
             ) {
                 viewModel.onPasswordChanged(it)
+            }
+            Row(
+                modifier = Modifier.background(color = Color.Transparent)
+                    .padding(start = 16.dp, end = 16.dp)
+//                    .background(color = Color.Green)
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.Top
+            ) {
+                TextButton(
+                    modifier = Modifier
+//                        .background(color = Color.Blue)
+                        .padding(start = 16.dp, end = 16.dp),
+                    colors = ButtonColors(
+                        containerColor = Color.Transparent,
+                        contentColor = Color.White,
+                        disabledContentColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent,
+                    ),
+                    onClick = {  },
+                ) {
+                    Text(
+                        text = "Забыли пароль?",
+                        color = Color.White,
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.padding(10.dp))
@@ -199,7 +234,7 @@ fun SignInScreen(navController: NavHostController) {
             Button(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 32.dp, end = 32.dp),
+                    .padding(start = 20.dp, end = 16.dp),
                 onClick = {
                     rememberCoroutineScope.launch {
                         viewModel.setBiometricEnabled(false)
@@ -218,32 +253,56 @@ fun SignInScreen(navController: NavHostController) {
                     modifier =
                         Modifier
                             .fillMaxWidth()
-                            .background(
-                                brush =
-                                    Brush.horizontalGradient(
-                                        colors = listOf(
-                                            Color(0xFF484BF1),
-                                            Color(0xFFB4A0F5)
-                                        )
-                                    ),
-                                shape = RoundedCornerShape(topStart = 30.dp, bottomEnd = 30.dp)
-                            )
+                            .background(color = Color.Yellow, shape = RoundedCornerShape(4.dp))
+//                            .background(
+//                                brush =
+//                                    Brush.horizontalGradient(
+//                                        colors = listOf(
+//                                            Color(0xFF484BF1),
+//                                            Color(0xFFB4A0F5)
+//                                        )
+//                                    ),
+//                                shape = RoundedCornerShape(topStart = 30.dp, bottomEnd = 30.dp)
+//                            )
                             .clip(RoundedCornerShape(topStart = 30.dp, bottomEnd = 30.dp))
                             .padding(horizontal = 16.dp, vertical = 8.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(text = "Авторизация", fontSize = 20.sp, color = Color.White)
+                    Text(text = "Войти", fontSize = 20.sp, color = Color.Red)
                 }
             }
 
             Spacer(modifier = Modifier.padding(10.dp))
-            TextButton(onClick = { navController.navigate(NavRoute.SIGN_UP.name) }) {
-                Text(
-                    text = "Создать новый аккаунт",
-                    letterSpacing = 1.sp,
-                    style = MaterialTheme.typography.labelLarge
-                )
+
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 20.dp, end = 16.dp),
+                onClick = { navController.navigate(NavRoute.SIGN_UP.name) },
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Box(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .background(color = Color.Red, shape = RoundedCornerShape(4.dp))
+                            .border(width = 1.dp, color = Color.Yellow, shape = RoundedCornerShape(4.dp))
+                            .clip(RoundedCornerShape(topStart = 30.dp, bottomEnd = 30.dp))
+                            .padding(vertical = 8.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(text = "Регистрация", fontSize = 20.sp, color = Color.Yellow)
+                }
             }
+
+//            TextButton(onClick = { navController.navigate(NavRoute.SIGN_UP.name) }) {
+//                Text(
+//                    text = "Создать новый аккаунт",
+//                    letterSpacing = 1.sp,
+//                    style = MaterialTheme.typography.labelLarge
+//                )
+//            }
         }
     }
 }

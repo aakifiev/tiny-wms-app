@@ -11,8 +11,8 @@ android {
         applicationId = "ru.hqr.tinywms"
         minSdk = 26
         targetSdk = 34
-        versionCode = 5
-        versionName = "0.1.2"
+        versionCode = 7
+        versionName = "0.1.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -52,6 +52,8 @@ android {
 }
 
 dependencies {
+
+    implementation("com.yandex.android:maps.mobile:4.29.0-lite")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

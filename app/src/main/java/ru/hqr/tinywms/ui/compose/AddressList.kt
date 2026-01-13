@@ -26,6 +26,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,7 +52,8 @@ fun AddressList(
     drawerState: DrawerState,
     scope: CoroutineScope,
     vm: AddressListViewModel,
-    navController: NavHostController
+    navController: NavHostController,
+    selectedDestination: MutableIntState
 ) {
 
     val context = LocalContext.current
@@ -120,7 +122,7 @@ fun AddressList(
                 }
             },
             bottomBar = {
-                BottomNavigationBar()
+                BottomNavigationBar(navController, selectedDestination)
             }
         ) { padding ->
             Column(

@@ -66,15 +66,15 @@ fun SignUpScreen(navController: NavHostController) {
                     BiometricHelper.registerUserBiometrics(context) {
                         showBiometricEnableDialog = false
                         viewModel.setBiometricEnabled(true)
-                        navController.navigate(NavRoute.STOCK_LIST.name)
+                        navController.navigate(NavRoute.HOME.name)
                     }
                 },
                 {
-                    navController.navigate(NavRoute.STOCK_LIST.name)
+                    navController.navigate(NavRoute.HOME.name)
                 }
             )
         } else {
-            navController.navigate(NavRoute.STOCK_LIST.name)
+            navController.navigate(NavRoute.HOME.name)
         }
     }
 

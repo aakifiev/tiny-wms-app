@@ -1,6 +1,5 @@
 package ru.hqr.tinywms.ui.signin
 
-import android.R
 import android.content.Context
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
@@ -21,8 +20,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -38,7 +35,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
@@ -82,7 +78,7 @@ fun SignInScreen(navController: NavHostController) {
 
     LaunchedEffect(key1 = state) {
         if (state is SignInState.Success && !showBiometricEnableDialog) {
-            navController.navigate(NavRoute.STOCK_LIST.name)
+            navController.navigate(NavRoute.HOME.name)
         }
     }
 
@@ -106,7 +102,7 @@ fun SignInScreen(navController: NavHostController) {
                             .enqueue(object : Callback<Int?> {
                                 override fun onResponse(p0: Call<Int?>, p1: Response<Int?>) {
                                     p1.body()?.let {
-                                        navController.navigate(NavRoute.STOCK_LIST.name)
+                                        navController.navigate(NavRoute.HOME.name)
                                     }
                                 }
 
@@ -181,7 +177,7 @@ fun SignInScreen(navController: NavHostController) {
                 onTrailingIconClicked = {
                     BiometricHelper.authenticateUser(context) { plainText ->
                         viewModel.setToken(plainText)
-                        navController.navigate(NavRoute.STOCK_LIST.name)
+                        navController.navigate(NavRoute.HOME.name)
                     }
                 }
             )
@@ -295,14 +291,6 @@ fun SignInScreen(navController: NavHostController) {
                     Text(text = "Регистрация", fontSize = 20.sp, color = Color.Yellow)
                 }
             }
-
-//            TextButton(onClick = { navController.navigate(NavRoute.SIGN_UP.name) }) {
-//                Text(
-//                    text = "Создать новый аккаунт",
-//                    letterSpacing = 1.sp,
-//                    style = MaterialTheme.typography.labelLarge
-//                )
-//            }
         }
     }
 }

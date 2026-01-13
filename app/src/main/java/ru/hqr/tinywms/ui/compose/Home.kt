@@ -1,7 +1,6 @@
 package ru.hqr.tinywms.ui.compose
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,9 +13,16 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DrawerState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -26,16 +32,16 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.launch
 import ru.hqr.tinywms.type.NavRoute
 import ru.hqr.tinywms.ui.component.BottomNavigationBar
 import ru.hqr.tinywms.ui.component.CustomModalNavigationDrawer
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Home(
     navController: NavHostController,
@@ -54,6 +60,33 @@ fun Home(
     )
     {
         Scaffold(
+            topBar = {
+                CenterAlignedTopAppBar(
+                    title = {
+                        Text(
+                            "Список товаров",
+                        )
+                    },
+                    navigationIcon = {
+                        Row {
+                            IconButton(onClick = {navController.popBackStack()}) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = "Localized description"
+                                )
+                            }
+                        }
+                    },
+                    actions = {
+                        IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                            Icon(
+                                imageVector = Icons.Filled.Menu,
+                                contentDescription = "Menu"
+                            )
+                        }
+                    }
+                )
+            },
             bottomBar = {
                 BottomNavigationBar(navController, selectedDestination)
             }
@@ -129,11 +162,6 @@ fun Home(
                                 Text(page.label)
                             }
                         }
-//                }
-//                Row(
-//                    modifier = Modifier
-//                        .padding(10.dp)
-//                ) {
 
                     }
                 }
@@ -143,7 +171,6 @@ fun Home(
                 ) {
                     Button(
                         modifier = Modifier
-//
                             .fillMaxWidth()
                             .fillMaxHeight(),
                         shape = RoundedCornerShape(16.dp),

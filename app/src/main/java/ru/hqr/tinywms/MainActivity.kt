@@ -77,7 +77,7 @@ class MainActivity : FragmentActivity() {
             val selectedDestination = remember { mutableIntStateOf(0) }
             TinyWmsTheme {
                 val navController = rememberNavController()
-                NavHost(navController, startDestination = NavRoute.HOME.name) {
+                NavHost(navController, startDestination = NavRoute.SIGN_IN.name) {
                     composable(NavRoute.SIGN_IN.name) {
                         SignInScreen(navController)
                     }

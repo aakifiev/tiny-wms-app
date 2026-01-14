@@ -167,7 +167,7 @@ fun Home(
                 }
                 Row(
                     modifier = Modifier
-                        .padding(horizontal = 10.dp)
+                        .padding(10.dp)
                 ) {
                     Button(
                         modifier = Modifier

@@ -48,8 +48,6 @@ fun Home(
     drawerState: DrawerState,
     selectedDestination: MutableIntState
 ) {
-
-//    lateinit var cameraExecutor: ExecutorService;
     val identifier = "[HomeScreen]"
     val scope = rememberCoroutineScope()
 
@@ -64,7 +62,7 @@ fun Home(
                 CenterAlignedTopAppBar(
                     title = {
                         Text(
-                            "Список товаров",
+                            "Главная страница",
                         )
                     },
                     navigationIcon = {
@@ -97,7 +95,7 @@ fun Home(
                     HomeButton("Каталог товаров", NavRoute.STOCK_LIST.name),
                     HomeButton("Открыть склад", NavRoute.ADDRESS_LIST.name),
                     HomeButton("Сформировать отчет", NavRoute.HOME.name),
-                    HomeButton("Сканировать штрихкод", NavRoute.HOME.name),
+                    HomeButton("Сканировать штрихкод", NavRoute.FIND_PRODUCT_INFO.name),
                     HomeButton("Написать в техподдержку", NavRoute.HOME.name)
                 )
             Column(
@@ -134,13 +132,7 @@ fun Home(
                     LazyVerticalStaggeredGrid(
                         columns = StaggeredGridCells.Adaptive(150.dp),
                         modifier = Modifier
-//                            .background(color = Color.Green)
                             .background(color = MaterialTheme.colorScheme.background)
-//                        .fillMaxWidth()
-//                        .width(350.dp)
-//                        .height(350.dp),
-//                    horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
-//                    verticalItemSpacing = 10.dp,
                     ) {
                         items(pages) { page ->
                             Button(
@@ -149,8 +141,6 @@ fun Home(
                                 modifier = Modifier
                                     .padding(10.dp)
                                     .fillMaxWidth()
-//                                .width(350.dp)
-//                                .fillMaxHeight()
                                     .height(150.dp),
                                 colors = ButtonColors(
                                     containerColor = Color.LightGray,

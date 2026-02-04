@@ -11,9 +11,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -195,7 +193,6 @@ fun StartStocktaking(
                 }
                 Row(
                     modifier = Modifier
-//                        .background(color = Color.Green)
                         .fillMaxHeight(0.8f),
                     verticalAlignment = Alignment.Top
                 ) {
@@ -205,7 +202,13 @@ fun StartStocktaking(
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         filteredItems.forEach { elem ->
-                            item { MessageInventoryRow(elem.key.title, elem.value) }
+                            item {
+                                MessageInventoryRow(
+                                    barcode = elem.key.barcode,
+                                    title = elem.key.title,
+                                    count = BigDecimal.valueOf(elem.value.toLong())
+                                )
+                            }
                         }
                     }
                 }

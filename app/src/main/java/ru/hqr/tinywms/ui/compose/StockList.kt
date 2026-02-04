@@ -40,7 +40,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import ru.hqr.tinywms.type.NavRoute
 import ru.hqr.tinywms.ui.component.BottomNavigationBar
 import ru.hqr.tinywms.ui.component.CustomModalNavigationDrawer
 import ru.hqr.tinywms.ui.component.FilterableList
@@ -194,8 +193,7 @@ fun StockList(
                     FilterableList(
                         items = vm.stocks,
                         query = searchQuery,
-//                        onStockInfoClick = onStockInfoClick
-                        onStockInfoClick = {barcode -> navController.navigate(NavRoute.STOCK_INFO.name)}
+                        onStockInfoClick = onStockInfoClick
                     )
                 }
             }

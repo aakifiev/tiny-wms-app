@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import ru.hqr.tinywms.dto.client.Stock
+import java.math.BigDecimal
 
 @Composable
 fun FilterableList(
@@ -43,13 +44,14 @@ fun FilterableList(
 
     LazyColumn(
         modifier = Modifier.fillMaxWidth(),
-        contentPadding = PaddingValues(16.dp),
+        contentPadding = PaddingValues(5.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(filteredItems) { stock ->
-            MessageRow(
-                stock,
-                onClick = { onStockInfoClick(stock.barcode) })
+            MessageInventoryRow(
+                stock.barcode, stock.title, BigDecimal.ZERO,
+                customOnClick = {onStockInfoClick(stock.barcode)}
+            )
         }
     }
 }

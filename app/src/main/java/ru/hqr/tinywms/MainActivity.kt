@@ -22,6 +22,7 @@ import ru.hqr.tinywms.type.NavRoute
 import ru.hqr.tinywms.ui.compose.Account
 import ru.hqr.tinywms.ui.compose.AddBarcodeInfo
 import ru.hqr.tinywms.ui.compose.AddStock
+import ru.hqr.tinywms.ui.compose.AddressInfo
 import ru.hqr.tinywms.ui.compose.AddressList
 import ru.hqr.tinywms.ui.compose.CameraScreen
 import ru.hqr.tinywms.ui.compose.Home
@@ -97,14 +98,29 @@ class MainActivity : FragmentActivity() {
                             selectedDestination = selectedDestination
                         )
                     }
-                    composable(NavRoute.STOCK_INFO.name) {
+                    composable("${NavRoute.STOCK_INFO.name}/barcode={barcode}") {backStackEntry ->
+                        val arguments = requireNotNull(backStackEntry.arguments)
+                        val barcode = arguments.getString("barcode")
                         StockInfo(
+                            barcode = barcode as String,
                             navigateBack = {
                                 navController.popBackStack()
                             },
                             drawerState = drawerState,
                             navController = navController,
-                            selectedDestination = selectedDestination
+                            selectedDestination = selectedDestination,
+                            vm = stockInfoListVM
+                        )
+                    }
+                    composable("${NavRoute.ADDRESS_INFO.name}/addressId={addressId}") { backStackEntry ->
+                        val arguments = requireNotNull(backStackEntry.arguments)
+                        val addressId = arguments.getString("addressId")
+                        AddressInfo(
+                            addressId = addressId as String,
+                            drawerState = drawerState,
+                            navController = navController,
+                            selectedDestination = selectedDestination,
+                            vm = stockInfoListVM
                         )
                     }
                     composable(NavRoute.FIND_PRODUCT_INFO.name) {
@@ -114,7 +130,7 @@ class MainActivity : FragmentActivity() {
                                 navController.popBackStack()
                             },
                             toProductInfo = { barcode ->
-                                navController.navigate("productInfo/barcode=$barcode")
+                                navController.navigate("${NavRoute.STOCK_INFO.name}/barcode=$barcode")
                             }
                         )
                     }
@@ -136,8 +152,8 @@ class MainActivity : FragmentActivity() {
                     }
                     composable(NavRoute.ADDRESS_LIST.name) {
                         AddressList(
-                            onStockInfoClick = { barcode ->
-                                navController.navigate("stockInfoList/barcode=$barcode/byBarcode=false")
+                            onStockInfoClick = { addressId ->
+                                navController.navigate("${NavRoute.ADDRESS_INFO.name}/addressId=$addressId")
                             },
                             navigateBack = {
                                 navController.popBackStack()
@@ -149,7 +165,7 @@ class MainActivity : FragmentActivity() {
                     composable(NavRoute.STOCK_LIST.name) {
                         StockList(
                             onStockInfoClick = { barcode ->
-                                navController.navigate("stockInfoList/barcode=$barcode/byBarcode=true")
+                                navController.navigate("${NavRoute.STOCK_INFO.name}/barcode=$barcode")
                             },
                             navigateBack = {
                                 navController.popBackStack()

@@ -112,15 +112,15 @@ fun AddressList(
                     }
                 )
             },
-            floatingActionButton = {
-                FloatingActionButton(
-                    onClick = {
-
-                    }
-                ) {
-                    Icon(Icons.Filled.Add, "Add address")
-                }
-            },
+//            floatingActionButton = {
+//                FloatingActionButton(
+//                    onClick = {
+//
+//                    }
+//                ) {
+//                    Icon(Icons.Filled.Add, "Add address")
+//                }
+//            },
             bottomBar = {
                 BottomNavigationBar(navController, selectedDestination)
             }

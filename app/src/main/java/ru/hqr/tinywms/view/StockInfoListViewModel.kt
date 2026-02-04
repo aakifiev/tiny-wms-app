@@ -62,7 +62,7 @@ class StockInfoListViewModel : ViewModel() {
     }
 
     fun getStockInfoList(clientId: Int, barcode: String) {
-        viewModelScope.launch {
+//        viewModelScope.launch {
             try {
                 _stockInfoList.clear()
                 val result = TinyWmsRest.retrofitService.findStockInfo(clientId, barcode)
@@ -86,7 +86,7 @@ class StockInfoListViewModel : ViewModel() {
             } catch (e: Exception) {
                 errorMessage = e.message.toString()
             }
-        }
+//        }
     }
 
 }

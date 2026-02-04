@@ -1,19 +1,14 @@
 package ru.hqr.tinywms.ui.compose
 
 import android.content.Context
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
@@ -37,40 +32,33 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ru.hqr.tinywms.dto.client.StockListInfo
+import ru.hqr.tinywms.type.NavRoute
 import ru.hqr.tinywms.ui.component.BottomNavigationBar
 import ru.hqr.tinywms.ui.component.CustomModalNavigationDrawer
+import ru.hqr.tinywms.ui.component.MessageInventoryRow
 import ru.hqr.tinywms.view.StockInfoListViewModel
-import java.math.BigDecimal
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StockInfo(
-    barcode: String,
-    navigateBack: () -> Unit,
+fun AddressInfo(
+    addressId: String,
     drawerState: DrawerState,
     navController: NavHostController,
     selectedDestination: MutableIntState,
-    vm: StockInfoListViewModel
+    vm: StockInfoListViewModel,
 ) {
 
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     var clientId by remember { mutableStateOf(0) }
-    var title by remember { mutableStateOf(barcode) }
 
     LaunchedEffect(Unit, block = {
         clientId = context.getSharedPreferences("TinyPrefs", Context.MODE_PRIVATE)
             .getInt("clientId", 0)
-        scope.launch {
-            vm.getStockInfoList(clientId, barcode)
-            delay(500)
-            title = vm.stockInfoList.first().title
-        }
+        vm.getStockInfoListByAddressId(clientId, addressId)
     })
 
     CustomModalNavigationDrawer(
@@ -84,12 +72,12 @@ fun StockInfo(
                 CenterAlignedTopAppBar(
                     title = {
                         Text(
-                            "Информация о товаре",
+                            "Информация об адресе",
                         )
                     },
                     navigationIcon = {
                         Row {
-                            IconButton(onClick = navigateBack) {
+                            IconButton(onClick = { navController.popBackStack() }) {
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                     contentDescription = "Localized description"
@@ -116,110 +104,53 @@ fun StockInfo(
                     .padding(padding)
                     .fillMaxWidth()
             ) {
-                commonInfo(
-                    barcode,
-                    title
-                    )
-                Spacer(modifier = Modifier
-                    .padding(top = 20.dp))
-                infoByAddress(vm.stockInfoList)
+                commonAddressInfo(addressId)
+                Spacer(
+                    modifier = Modifier
+                        .padding(top = 20.dp)
+                )
+                infoByAddress2(vm.stockInfoList,
+                    navController
+                )
             }
         }
     }
 }
 
 @Composable
-fun commonInfo(
-    barcode: String,
-    title: String
-) {
+fun commonAddressInfo(addressId: String) {
     Row(
         modifier = Modifier
             .background(color = Color.Red)
-            .height(90.dp)
-            .padding(horizontal = 20.dp)
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .height(90.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Column() {
-            Text(text = "штрихкод: $barcode", color = Color.Black)
-            Text(text = "Товар: $title", color = Color.Black)
-        }
-        Column() {
-            Text("<12>", color = Color.Black)
+        Column(
+            modifier = Modifier.padding(start = 20.dp)
+        ) {
+            Text(text = "адрес: $addressId", color = Color.Black)
         }
     }
 }
 
 @Composable
-fun infoByAddress(infoByAddressList: List<StockListInfo>) {
+fun infoByAddress2(infoByAddressList: List<StockListInfo>, navController: NavHostController) {
     Column(
         modifier = Modifier
-            .padding(start = 20.dp)
             .fillMaxWidth()
+            .padding(horizontal = 20.dp),
     ) {
-        Text("Адреса с товаром")
+        Text("Список товаров")
         infoByAddressList.forEach { info ->
-            MessageAddressRow(
-                info.addressId,
-                info.quantity
+            MessageInventoryRow(
+                barcode = info.barcode,
+                title = info.title,
+                count = info.quantity,
+                customOnClick = { navController.navigate("${NavRoute.STOCK_INFO.name}/barcode=${info.barcode}") }
             )
             Spacer(modifier = Modifier.padding(top = 5.dp))
-        }
-    }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun MessageAddressRow(
-    address: String,
-    count: BigDecimal
-) {
-    Row(
-        modifier = Modifier
-            .height(90.dp)
-            .fillMaxHeight()
-            .background(color = Color.LightGray, shape = RoundedCornerShape(16.dp)),
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxHeight()
-                .padding(8.dp)
-                .fillMaxWidth(0.8f),
-            verticalArrangement = Arrangement.Center,
-        ) {
-            Text(text = address, color = Color.Black, fontSize = 10.sp)
-        }
-        Column(
-            modifier = Modifier
-                .fillMaxWidth(),
-        ) {
-            Box(modifier = Modifier
-                .fillMaxHeight()
-                .width(90.dp)
-//                .clickable(onClick = customOnClick)
-                .background(color = Color.Yellow, shape = RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp)),
-                contentAlignment = Alignment.Center
-            ) {
-                Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-//                        IconButton(onClick = {}) {
-//                            Icon(
-//                                imageVector = Icons.Default.KeyboardArrowLeft,
-//                                contentDescription = "minus"
-//                            )
-//                        }
-                        Text(text = "$count шт.", color = Color.Black)
-//                        IconButton(onClick = {}) {
-//                            Icon(
-//                                imageVector = Icons.Default.KeyboardArrowRight,
-//                                contentDescription = "plus"
-//                            )
-//                        }
-                    }
-            }
         }
     }
 }

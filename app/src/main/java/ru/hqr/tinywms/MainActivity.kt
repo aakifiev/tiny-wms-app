@@ -31,7 +31,6 @@ import ru.hqr.tinywms.ui.compose.ProductFind
 import ru.hqr.tinywms.ui.compose.ProductInfo
 import ru.hqr.tinywms.ui.compose.StartStocktaking
 import ru.hqr.tinywms.ui.compose.StockInfo
-import ru.hqr.tinywms.ui.compose.StockInfoList
 import ru.hqr.tinywms.ui.compose.StockList
 import ru.hqr.tinywms.ui.signin.SignInScreen
 import ru.hqr.tinywms.ui.signup.SignUpScreen
@@ -196,15 +195,6 @@ class MainActivity : FragmentActivity() {
                             addressListVM, productListVM,
                             cameraExecutor,
                             navController
-                        )
-                    }
-                    composable("stockInfoList/barcode={barcode}/byBarcode={byBarcode}") { backStackEntry ->
-                        val arguments = requireNotNull(backStackEntry.arguments)
-                        val barcode = arguments.getString("barcode")
-                        val byBarcode = arguments.getString("byBarcode").toBoolean()
-                        StockInfoList(
-                            barcode as String, byBarcode,
-                            drawerState, scope, stockInfoListVM, navController
                         )
                     }
                     composable("loginPage") {

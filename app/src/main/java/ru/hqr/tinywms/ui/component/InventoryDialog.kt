@@ -23,9 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,7 +32,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -50,22 +47,17 @@ fun InventoryDialog(
     filteredItemsResult: MutableMap<Barcode, Short>
 ) {
     val filteredItems = remember { mutableStateMapOf<Barcode, Short>() }
-//    val isScan = remember { mutableStateOf(false) }
-    val buttonScanText = remember { mutableStateOf("Сканировать") }
-    val rememberCoroutineScope = rememberCoroutineScope()
     if (!showDialog.value) return
     Dialog(
         onDismissRequest = {
             showDialog.value = false
             filteredItems.clear()
-        },
-        properties = DialogProperties(usePlatformDefaultWidth = false)
+        }, properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(),
-            shape = RoundedCornerShape(16.dp)
+                .fillMaxHeight(), shape = RoundedCornerShape(16.dp)
         ) {
             Box(
                 modifier = Modifier
@@ -73,32 +65,27 @@ fun InventoryDialog(
                     .height(360.dp)
                     .clip(shape = RoundedCornerShape(6.dp))
             ) {
-                Camera(
-                    executor = executorHs,
-                    onError = {
-                        Log.i("scanBarcode", "There was as error with the camera: $it")
-                    },
-                    onCatchBarcode = { barcode ->
-                        rememberCoroutineScope.launch {
-                            val result = TinyWmsRest.retrofitService.findBarcode(barcode)
-                            result!!.enqueue(object : Callback<Barcode?> {
-                                override fun onResponse(
-                                    p0: Call<Barcode?>,
-                                    p1: Response<Barcode?>
-                                ) {
-                                    filteredItems.merge(p1.body()!!, 1)
-                                    { oldVal, newVal -> (newVal + oldVal).toShort() }
-                                    buttonScanText.value = "Сканировать"
-                                    filteredItemsResult.putAll(filteredItems)
-                                    showDialog.value = false
-                                }
+                Camera(executor = executorHs, onError = {
+                    Log.i("scanBarcode", "There was as error with the camera: $it")
+                }, onCatchBarcode = { barcode ->
+                    val result = TinyWmsRest.retrofitService.findBarcode(barcode)
+                    result.enqueue(object : Callback<Barcode?> {
+                        override fun onResponse(
+                            p0: Call<Barcode?>, p1: Response<Barcode?>
+                        ) {
+                            filteredItems.merge(
+                                p1.body()!!,
+                                1
+                            ) { oldVal, newVal -> (newVal + oldVal).toShort() }
+                            filteredItemsResult.putAll(filteredItems)
+                            showDialog.value = false
+                        }
 
-                                override fun onFailure(p0: Call<Barcode?>, p1: Throwable) {
-                                    Log.i("", "onFailure: ")
-                                }
-                            })
+                        override fun onFailure(p0: Call<Barcode?>, p1: Throwable) {
+                            Log.i("", "onFailure: ")
                         }
                     })
+                })
 
             }
 
@@ -109,9 +96,7 @@ fun InventoryDialog(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MessageInventoryRow(
-    barcode: String,
-    title: String,
-    count: BigDecimal, customOnClick: () -> Unit = {}
+    barcode: String, title: String, count: BigDecimal, customOnClick: () -> Unit = {}
 ) {
     Row(
         modifier = Modifier
@@ -131,8 +116,7 @@ fun MessageInventoryRow(
             Text(text = "Всего на складе: $count шт.", color = Color.Black, fontSize = 10.sp)
         }
         Column(
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
         ) {
             Box(
                 modifier = Modifier
@@ -142,8 +126,7 @@ fun MessageInventoryRow(
                     .background(
                         color = Color.Yellow,
                         shape = RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp)
-                    ),
-                contentAlignment = Alignment.Center
+                    ), contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Filled.PlayArrow,

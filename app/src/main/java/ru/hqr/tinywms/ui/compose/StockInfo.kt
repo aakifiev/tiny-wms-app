@@ -1,6 +1,7 @@
 package ru.hqr.tinywms.ui.compose
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -16,6 +17,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DrawerState
@@ -41,6 +46,11 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import ru.hqr.tinywms.conf.TinyWmsRest
+import ru.hqr.tinywms.dto.client.StockInfoRequest
 import ru.hqr.tinywms.dto.client.StockListInfo
 import ru.hqr.tinywms.ui.component.BottomNavigationBar
 import ru.hqr.tinywms.ui.component.CustomModalNavigationDrawer
@@ -154,6 +164,9 @@ fun commonInfo(
 
 @Composable
 fun infoByAddress(infoByAddressList: List<StockListInfo>) {
+    val clientId = LocalContext.current.getSharedPreferences("TinyPrefs", Context.MODE_PRIVATE)
+        .getInt("clientId", 0)
+
     Column(
         modifier = Modifier
             .padding(start = 20.dp)
@@ -163,7 +176,9 @@ fun infoByAddress(infoByAddressList: List<StockListInfo>) {
         infoByAddressList.forEach { info ->
             MessageAddressRow(
                 info.addressId,
-                info.quantity
+                info.quantity,
+                info.barcode,
+                clientId
             )
             Spacer(modifier = Modifier.padding(top = 5.dp))
         }
@@ -173,9 +188,18 @@ fun infoByAddress(infoByAddressList: List<StockListInfo>) {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MessageAddressRow(
-    address: String,
-    count: BigDecimal
+    addressId: String,
+    count: BigDecimal,
+    barcode: String,
+    clientId: Int
 ) {
+
+    val isEdit = remember { mutableStateOf(true) }
+    val editedCount = remember {
+        mutableStateOf(count)
+    }
+    val rememberCoroutineScope = rememberCoroutineScope()
+
     Row(
         modifier = Modifier
             .height(90.dp)
@@ -189,7 +213,87 @@ fun MessageAddressRow(
                 .fillMaxWidth(0.8f),
             verticalArrangement = Arrangement.Center,
         ) {
-            Text(text = address, color = Color.Black, fontSize = 10.sp)
+            Text(text = addressId, color = Color.Black, fontSize = 15.sp)
+            if (isEdit.value) {
+                Row() {
+                    Text(text = "Товаров на адресе: ${editedCount.value} шт.", color = Color.Black, fontSize = 15.sp)
+                    IconButton(
+                        onClick = {
+                            isEdit.value = false
+                        },
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = "edit",
+                            tint = Color.Black
+                        )
+                    }
+                }
+            } else {
+                Row() {
+                    Text(text = "Товаров на адресе: ", color = Color.Black, fontSize = 15.sp)
+                    IconButton(
+                        onClick = {
+                            if (BigDecimal.ZERO != editedCount.value) {
+                                editedCount.value = editedCount.value.minus(BigDecimal.ONE)
+                            }
+                        },
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.KeyboardArrowLeft,
+                            contentDescription = "minus",
+                            tint = Color.Black
+                        )
+                    }
+                    Text(text = "${editedCount.value}", color = Color.Black, fontSize = 15.sp)
+                    IconButton(
+                        onClick = {
+                            editedCount.value = editedCount.value.plus(BigDecimal.ONE)
+                        },
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.KeyboardArrowRight,
+                            contentDescription = "plus",
+                            tint = Color.Black
+                        )
+                    }
+                    IconButton(
+                        onClick = {
+                            isEdit.value = true
+                            val stockInfo = StockInfoRequest(
+                                barcode = barcode,
+                                quantity = editedCount.value,
+                                measureUnit = "шт.")
+                            rememberCoroutineScope.launch {
+                                TinyWmsRest.retrofitService.actualizeStockInfo(
+                                    clientId,
+                                    addressId,
+                                    listOf(stockInfo)).enqueue(object : Callback<Unit> {
+                                    override fun onResponse(
+                                        p0: Call<Unit>,
+                                        p1: Response<Unit>
+                                    ) {
+                                        Log.i("onResponse", p1.toString())
+                                    }
+
+                                    override fun onFailure(p0: Call<Unit>, p1: Throwable) {
+                                        Log.i("onFailure", "onFailure")
+                                    }
+
+                                })
+                            }
+                        },
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Done,
+                            contentDescription = "done",
+                            tint = Color.Black
+                        )
+                    }
+                    Text(text = " шт.", color = Color.Black, fontSize = 15.sp)
+                }
+            }
+
         }
         Column(
             modifier = Modifier
@@ -205,19 +309,7 @@ fun MessageAddressRow(
                 Row(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-//                        IconButton(onClick = {}) {
-//                            Icon(
-//                                imageVector = Icons.Default.KeyboardArrowLeft,
-//                                contentDescription = "minus"
-//                            )
-//                        }
-                        Text(text = "$count шт.", color = Color.Black)
-//                        IconButton(onClick = {}) {
-//                            Icon(
-//                                imageVector = Icons.Default.KeyboardArrowRight,
-//                                contentDescription = "plus"
-//                            )
-//                        }
+                        Text(text = "${editedCount.value} шт.", color = Color.Black)
                     }
             }
         }

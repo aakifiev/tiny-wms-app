@@ -230,7 +230,7 @@ fun MessageAddressRow(
                     }
                 }
             } else {
-                Row() {
+                Row {
                     Text(text = "Товаров на адресе: ", color = Color.Black, fontSize = 15.sp)
                     IconButton(
                         onClick = {
